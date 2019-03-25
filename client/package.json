@@ -1,0 +1,30 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "capstone client",
+  "author": "dela cerna derkwin",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/auth": "^4.5.3",
+    "@nuxtjs/axios": "^5.4.1",
+    "bootstrap-vue": "^2.0.0-rc.15",
+    "cross-env": "^5.2.0",
+    "highcharts": "^7.0.3",
+    "highcharts-vue": "^1.2.0",
+    "mqtt": "^2.18.8",
+    "nuxt": "^2.4.0",
+    "nuxt-sweetalert2": "^1.0.0",
+    "vue-mqtt": "^2.0.3",
+    "vue-mqttsocket": "^0.2.0",
+    "vue-sweetalert2": "^1.6.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}

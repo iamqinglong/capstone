@@ -1,0 +1,24 @@
+.box-wrapper[_ngcontent-c8] {
+  height: auto;
+  border: 1px solid #36404a;
+  border-radius: 3px;
+  background: #36404a;
+  -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.14);
+          box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.14);
+  padding: 15px;
+  margin: 15px 0 15px; }
+
+.no-padding[_ngcontent-c8] {
+  padding: 0 !important; }
+
+.app-statistics[_ngcontent-c8]   h2[_ngcontent-c8] {
+  font-size: 20px; }
+
+.app-statistics[_ngcontent-c8]   p[_ngcontent-c8] {
+  margin-bottom: 0; }
+
+.app-statistics[_ngcontent-c8]   .app-statistics-value[_ngcontent-c8] {
+  font-size: 35px;
+  color: #aaa;
+  font-weight: 500;
+  padding-right: 10px; }
