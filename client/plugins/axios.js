@@ -11,7 +11,7 @@ export default function({$axios, store}) {
             store.dispatch("validation/set404Errors", error.response.data)
         }
 
-        return Promise.reject(error)
+        return Promise.reject(error.response)
     })
 
     $axios.onRequest(() => {

@@ -15,7 +15,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="mdi mdi-account"></i></span>
                             </div>
-                            <input name="email" v-model="email" class="form-control" required="" type="email" placeholder="Email">
+                            <input name="email" v-model="email" class="form-control" type="email" placeholder="Email">
                         </div>
                         <small class="form-text text-danger" v-if="errors.email">{{errors.email}}</small>
                     </div>
@@ -27,7 +27,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="mdi mdi-key"></i></span>
                             </div>
-                            <input name="password" v-model="password" class="form-control" required="" type="password" placeholder="Password">
+                            <input name="password" v-model="password" class="form-control" type="password" placeholder="Password">
                         </div>
                         <small class="form-text text-danger" v-if="errors.password">{{errors.password}}</small>
                     </div>
