@@ -27,7 +27,11 @@
                                         </div>
                                         <br>
                                         <div>
-                                           <v-client-table :data="data" :columns="columns" :options="options"> </v-client-table>
+                                           <v-client-table :data="data" :columns="columns" :options="options"> 
+                                             <a slot="email" slot-scope="props" :href="`mailto:${props.row.email}`">
+                                              {{props.row.email}}
+                                            </a>
+                                           </v-client-table>
                                         </div>
                                        
                                     </div>
@@ -66,10 +70,11 @@ import axios from 'axios'
 import Vue from 'vue'
 import {ClientTable, Event} from 'vue-tables-2';
 Vue.use(ClientTable);
-import daterangepicker from 'daterangepicker';
+// import daterangepicker from 'daterangepicker';
 //This is very important to used with the window object
 // window.moment = require('moment')
-import moment from 'moment'
+// import moment from 'moment'
+
 export default {
   middleware: 'auth',
   components:{
@@ -80,23 +85,35 @@ export default {
   },
   data(){
             return {
-                columns: [ 'id', 'fName','lName','phone',''],
+                  columns: [
+                  'id',
+                  'name',
+                  'email'
+                  ],
                 data: this.getData(),
                 options: {
-                    headings: {
-                        fName: 'First Name',
-                        lName: 'Last Name',
-                        phone: 'Phone Number',
-                        id: '#',
-                      },
-                    sortable: ['id', 'fName'],
-                    texts: {
-                      filter: ''
-                    }, 
-                    filterable:['id','fName'],
-                }
-            }
-            
+                  headings: {
+                    id: 'id',
+                    name: 'name',
+                    email: 'email'
+                  },
+                  sortable: [
+                    'id', 'name'
+                    ],
+                  texts: {
+                    filterPlaceholder: 'filter'
+                  },
+                  sortIcon: {
+                    base : 'fa',
+                    is: 'fa-sort',
+                    up: 'fa-sort-asc',
+                    down: 'fa-sort-desc'
+                  },
+                  texts: {
+                    filter: ''
+                  }, 
+              },
+            }   
         },
     async asyncData ({ params, error }) {
 
@@ -165,42 +182,78 @@ export default {
             }
            
         },
+        
         getData() {
-          return [
-            {
-              'id': 1,
-              'fName': 'sample1',
-              'lName': 'sample1',
-              'phone': '12121'
-            },
-            {
-              'id': 2,
-              'fName': 'sample2',
-              'lName': 'sample2',
-              'phone': '12121'
-            },
-
-            {
-              'id': 3,
-              'fName': 'sample3',
-              'lName': 'sample3',
-              'phone': '12121'
-            },
-            {
-              'id': 4,
-              'fName': 'sample4',
-              'lName': 'sample4',
-              'phone': '12121'
-            }
-          ];
-      }
+          const arr = []
+          for (var i = 0; i < 20; i++) {
+            arr.push({
+              'id': i,
+              'name': `sample${i}`,
+              'email': `sample${i}@example.com`,
+              'group_name': 'Personnel'
+            });
+          }
+          return arr;
+        }
     },
     
 };
 </script>
 
 <style type="scss">
+#app {
+  width: 95%;
+  margin-top: 50px; 
+}
   .table {
     color: #f2f5f9;
 }
+
+.VuePagination {
+  text-align: center;
+}
+
+.vue-title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.vue-pagination-ad {
+  text-align: center;
+}
+
+.glyphicon.glyphicon-eye-open {
+  width: 16px;
+  display: block;
+  margin: 0 auto;
+}
+
+th:nth-child(3) {
+  text-align: center;
+}
+
+.VueTables__child-row-toggler {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  display: block;
+  margin: auto;
+  text-align: center;
+}
+
+.VueTables__child-row-toggler--closed::before {
+  content: "+";
+}
+
+.VueTables__child-row-toggler--open::before {
+  content: "-";
+}
+
+.table .thead-dark th {
+    color: #fff;
+    background-color: #343a40;
+    border-color: #454d55;
+}
+
+
 </style>

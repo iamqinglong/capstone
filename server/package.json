@@ -24,6 +24,7 @@
     "mongoose-validatorjs": "^0.7.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "serialport": "^7.1.4",
     "validate.io-alphanumeric": "^1.0.0",
     "websocket-stream": "^5.1.2"
   },

@@ -13,6 +13,8 @@ const passport = require('passport')
 const app = express(http);
 const web = http.createServer(app);
 const rtsIndex = require('./routes/index.router')
+const serialPort = require('serialport');
+const readLine = serialPort.parsers.Readline;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -32,7 +34,7 @@ mqtt.listen(mqtt_port, () => {
 
 
 web.listen(process.env.PORT, () => {
-    console.log(`Web Server running at ${process.env.PORT}`)
+    console.log(`Web Server running at ${process.env.PORT} , ${web.address().address}`)
 })
 websocket.createServer({server: web}, aedes.handle);
 
@@ -76,3 +78,43 @@ app.get('/',(req,res)=>{
         message: "HELLO WORLD"
     })
 })
+
+//SERIAL COMMUNICATION
+const sensorPort = new serialPort('COM3', {
+    baudRate: 9600,
+});
+
+const parser = sensorPort.pipe(new readLine({ delimiter: '\r\n'}));
+parser.on('open', onOpen);
+
+parser.on('data', (data) => {
+
+    console.log(data)
+
+   try{
+        
+    aedes.publish({
+        qos: 0,
+        topic: '/temp1',
+        payload: data,
+        retain: false
+      });
+    let datum = parseInt(data)+2
+    aedes.publish({
+        qos: 0,
+        topic: '/temp2',
+        payload: datum.toString(),
+        retain: false
+    });
+    // console.log('test')
+
+   }catch(error){
+        console.log(error)
+   }
+
+    
+      
+});
+function onOpen() {
+    console.log('Arduino connected!');
+}
