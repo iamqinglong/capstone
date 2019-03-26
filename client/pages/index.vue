@@ -78,7 +78,10 @@ export default {
 
         })
     },
-    mounted() {
+    async mounted() {
+      
+       // this.$mqtt = await this.$mqtt
+       //  console.log('Mounted')
     },
 }
 </script>

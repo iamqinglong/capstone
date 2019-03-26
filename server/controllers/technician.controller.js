@@ -38,10 +38,10 @@ module.exports.get = async (req, res, next) => {
     // })
     try {
 
-        let query = await Technician.find({ _id: mongoose.Types.ObjectId(req.params.id)}).limit(1).exec();
-        if(query.length)
+        let technician = await Technician.find({ _id: mongoose.Types.ObjectId(req.params.id)}).limit(1).exec();
+        if(technician.length)
         {
-          res.status(200).send( query )
+          res.status(200).send( {status: true, technician } )
         }
         else res.status(404).send( {status: false, 'message': 'Technician not found'})
         
@@ -108,28 +108,59 @@ try {
 
 module.exports.update = async (req, res,next) => {
 
-try {
+    // try {
 
-    let result =  await Technician.findByIdAndUpdate(req.params.id,
-        {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        phone_number: req.body.phone
+    //     let result =  await Technician.findByIdAndUpdate(req.params.id,
+    //         {
+    //         first_name: req.body.first_name,
+    //         last_name: req.body.last_name,
+    //         phone_number: req.body.phone
 
-        }).exec();
-    // var technician = await Technician.findById(req.params.id).exec();
-    // technician.set(req.body);
-    // var result = await technician.save();
-    // res.status(200).send(result);
-    if(result == null)
-    {
-        res.status(404).send({status: false,   'message' : 'Technician to update not found'})
-    }
-    return res.status(200).json( result )
-} catch (error) {
-    // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
-    return next(error)
-}
+    //         }).exec();
+    //     // var technician = await Technician.findById(req.params.id).exec();
+    //     // technician.set(req.body);
+    //     // var result = await technician.save();
+    //     // res.status(200).send(result);
+    //     if(result == null)
+    //     {
+    //         res.status(404).send({status: false,   'message' : 'Technician to update not found'})
+    //     }
+    //     return res.status(200).json( result )
+    // } catch (error) {
+    //     // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
+    //     return next(error)
+    // }
+    try {
+      const id = req.params.id
+      const technician = req.body
+      const { ...updateData } = technician
+      const update = await Technician.update({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
+      // const update = await Device.findOneAndUpdate(id, updateData, { new: true, runValidators: true, context: 'query' })
+      return res.status(200).send( update )
+      // let result = await Device.findOneAndUpdate(req.params.id,
+      //   {
+
+      //     device_name: req.body.device_name,
+      //     data_source: req.body.data_source,
+      //     location: req.body.location
+
+      //   },
+      //   { runValidators: true, context: 'query' }
+      //   );
+      
+      // if(result == null)
+      // {
+      //   return res.status(404).send({status: false, 'message' : 'Device to update not found'})
+      // }
+      // return res.status(200).send( result )
+  } catch (error) {
+      // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
+      // if(error.code == 11000)
+      // {
+      //   return res.status(422).send({status: false, 'device_name' : 'Device name is already acquired'})
+      // }
+      return next(error)
+  }
 
 }
 

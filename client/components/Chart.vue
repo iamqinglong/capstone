@@ -58,7 +58,7 @@ Vue.use(HighchartsVue);
 // import VueMqtt from 'vue-mqtt';
 // Vue.use(VueMqtt, 'ws://localhost:8000');
 
-import mqtt from 'mqtt'
+// import mqtt from 'mqtt'
 import style_ten from '@/static/css/style_ten.css'
 import style_thirteen from '@/static/css/style_thirteen.css'
 
@@ -71,7 +71,7 @@ export default {
     data()
     {
         return {
-            client: mqtt.connect('ws:127.0.0.1:8000'),
+            // client: mqtt.connect('ws:127.0.0.1:8000'),
             current: 10,
             chartOptions: {
             chart: {
@@ -149,13 +149,12 @@ export default {
     beforeMount() {
  
     },
-    mounted () {
-        
+    async mounted () {
+        this.$mqtt = await this.$mqtt
         // this.load();
+        this.$mqtt.subscribe(this.dev.data_source, 'Hello MQTT from NUXT')
         const series = this.$children[0].chart.series[0];
-        // this.$mqtt.subscribe(this.dev.topic,()=>{
-        //     console.log('Subscribe to ', this.dev.topic)
-        // })
+      
 
         // this.$mqtt.on('message', (topic, message,packet)  => {
         //     // message is Buffer
@@ -178,27 +177,27 @@ export default {
             
         // })    
 
-        this.client.subscribe(this.dev.data_source, () =>{
-            console.log(
-                `Successfully subscribe to ${this.dev.data_source}`
-            )
-        })
+        // this.client.subscribe(this.dev.data_source, () =>{
+        //     console.log(
+        //         `Successfully subscribe to ${this.dev.data_source}`
+        //     )
+        // })
 
-        this.client.on('message', (topic, message) => {
-            console.log('Topic: ',topic,' Value: ',message)
-            // if(topic == this.dev.topic)
-            // {
-                let msg = message.toString()
-                this.test(msg)
-                let time =  (new Date()).getTime();
-                series.addPoint([time, parseInt(msg)],true,true);
+        // this.client.on('message', (topic, message) => {
+        //     console.log('Topic: ',topic,' Value: ',message)
+        //     // if(topic == this.dev.topic)
+        //     // {
+        //         let msg = message.toString()
+        //         this.test(msg)
+        //         let time =  (new Date()).getTime();
+        //         series.addPoint([time, parseInt(msg)],true,true);
             // }
             // console.log('Message: ', message.toString())
             // this.current = parseInt(message);
             // let value = Math.random() * 10;
             // this.test(message.toString())
             
-        })
+        // })
         
 
     },
@@ -232,7 +231,8 @@ export default {
         // this.$mqtt.unsubscribe(this.dev.topic)
         // this.$mqtt.end()
         // this.$forceUpdate();
-        this.client.end()
+        // this.client.end()
+         this.$mqtt.unsubscribe(this.dev.data_source)
     },
 }
 </script>

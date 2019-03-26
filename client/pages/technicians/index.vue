@@ -20,17 +20,23 @@
                                              List of Devices
                                           </p>
                                           <div >
-                                            <nuxt-link to="/devices/create">
-                                              <button type="button" class="btn btn-primary waves-effect waves-light">Connect a new device</button>
+                                            <nuxt-link to="/technicians/create">
+                                              <button type="button" class="btn btn-primary waves-effect waves-light">New Technician</button>
                                             </nuxt-link> 
                                           </div>
                                         </div>
                                         <br>
                                         <div>
                                            <v-client-table :data="data" :columns="columns" :options="options"> 
-                                             <a slot="email" slot-scope="props" :href="`mailto:${props.row.email}`">
+                                            <!--  <a slot="email" slot-scope="props" :href="`mailto:${props.row.email}`">
                                               {{props.row.email}}
-                                            </a>
+                                            </a> -->
+                                            <span slot="actions" slot-scope="{row}"> 
+                                                <!-- <button v-on:click="edit(row.id)">Edit</button> -->
+                                                <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
+                                                <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
+                                            </span>
+
                                            </v-client-table>
                                         </div>
                                        
@@ -86,19 +92,24 @@ export default {
   data(){
             return {
                   columns: [
-                  'id',
-                  'name',
-                  'email'
+                  // '_id',
+                  'first_name',
+                  'last_name',
+                  'phone_number',
+                  'actions'
                   ],
-                data: this.getData(),
+                data: [],
                 options: {
                   headings: {
-                    id: 'id',
-                    name: 'name',
-                    email: 'email'
+                    // _id: {columnsDisplay: true},
+                    first_name: 'First Name',
+                    last_name: 'Last Name',
+                    phone_number: 'Phone Number',
+                    actions: 'Actions'
                   },
                   sortable: [
-                    'id', 'name'
+                    // '_id', 
+                    'first_name', 'last_name'
                     ],
                   texts: {
                     filterPlaceholder: 'filter'
@@ -111,17 +122,17 @@ export default {
                   },
                   texts: {
                     filter: ''
-                  }, 
+                  },
               },
             }   
         },
     async asyncData ({ params, error }) {
 
-        return await axios.get('http://localhost:8000/api/getAllDevice')
+        return await axios.get('http://localhost:8000/api/getAllTechnician')
 
     .then((res) => {
         console.log(res.data)
-        return { devices : res.data}
+        return { technician : res.data}
 
     })
     .catch((e) => {
@@ -129,6 +140,10 @@ export default {
         console.log(e)
 
     })
+    },
+    async mounted() {
+      this.data = this.technician
+      // console.log(this.technician)
     },
     methods: {
          async deleteDevice (id){
@@ -187,10 +202,10 @@ export default {
           const arr = []
           for (var i = 0; i < 20; i++) {
             arr.push({
-              'id': i,
-              'name': `sample${i}`,
-              'email': `sample${i}@example.com`,
-              'group_name': 'Personnel'
+              '_id': i,
+              'first_name': `first sample${i}`,
+              'last_name': `last sample${i}`,
+              'phone_number': `${i}`
             });
           }
           return arr;

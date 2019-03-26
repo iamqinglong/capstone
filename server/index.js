@@ -80,41 +80,41 @@ app.get('/',(req,res)=>{
 })
 
 //SERIAL COMMUNICATION
-const sensorPort = new serialPort('COM3', {
-    baudRate: 9600,
-});
+// const sensorPort = new serialPort('COM3', {
+//     baudRate: 9600,
+// });
 
-const parser = sensorPort.pipe(new readLine({ delimiter: '\r\n'}));
-parser.on('open', onOpen);
+// const parser = sensorPort.pipe(new readLine({ delimiter: '\r\n'}));
+// parser.on('open', onOpen);
 
-parser.on('data', (data) => {
+// parser.on('data', (data) => {
 
-    console.log(data)
+//     console.log(data)
 
-   try{
+//    try{
         
-    aedes.publish({
-        qos: 0,
-        topic: '/temp1',
-        payload: data,
-        retain: false
-      });
-    let datum = parseInt(data)+2
-    aedes.publish({
-        qos: 0,
-        topic: '/temp2',
-        payload: datum.toString(),
-        retain: false
-    });
-    // console.log('test')
+//     aedes.publish({
+//         qos: 0,
+//         topic: '/temp1',
+//         payload: data,
+//         retain: false
+//       });
+//     let datum = parseInt(data)+2
+//     aedes.publish({
+//         qos: 0,
+//         topic: '/temp2',
+//         payload: datum.toString(),
+//         retain: false
+//     });
+//     // console.log('test')
 
-   }catch(error){
-        console.log(error)
-   }
+//    }catch(error){
+//         console.log(error)
+//    }
 
     
       
-});
-function onOpen() {
-    console.log('Arduino connected!');
-}
+// });
+// function onOpen() {
+//     console.log('Arduino connected!');
+// }
