@@ -17,6 +17,7 @@ router.get('/getAllDevice', crtlDevice.getAll)
 router.get('/getDeviceTechnician/:id', crtlDevice.getDevTech)
 router.delete('/deleteDevice/:id', crtlDevice.delete)
 router.put('/updateDevice/:id', crtlDevice.update)
+router.get('/getAllNotDeviceTechnician/:id', crtlDevice.getAllNotDevTech)
 
 router.post('/createTech', crtlTech.create)
 router.get('/getTechnician/:id', crtlTech.get)

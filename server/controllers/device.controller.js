@@ -404,12 +404,53 @@ module.exports.getDevTech = async (req, res,next) => {
     
     // return res.status(200).send( { device, technicians: device.technicians })
      query.exec((err, device) => {
-        return res.status(200).send( {status: true, device} )
+        return res.status(200).send( device )
     })
   } catch (error) {
       // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
       return next(error)
   }
  
+}
+
+module.exports.getAllNotDevTech = async (req, res,next) => {
+
+try {
+    
+      let query =  Device.aggregate([
+      {
+        '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
+      },
+      { '$lookup': { 'from': DeviceTechnician.collection.name,
+        'localField': '_id',
+        'foreignField': 'devId',
+        'as': 'technicians1st'
+      }},
+
+      { '$unwind': '$technicians1st' },
+      // { '$lookup': {
+      //     'from': Technician.collection.name,
+      //     'localField': 'technicians1st.techId',
+      //     'foreignField': '_id',
+      //     'as' : 'technicians2nd'
+      // }},
+
+      // { '$unwind': '$technicians2nd' },
+      // { '$group': {
+      //   '_id': '$_id',
+      //   'device_name': { '$first': '$device_name' },
+      //   'technicians': { '$push': '$technicians2nd' }
+      // }}
+    ]);
+    
+    // return res.status(200).send( { device, technicians: device.technicians })
+    query.exec((err, technician) => {
+        return res.status(200).json( technician )
+    })
+} catch (error) {
+    // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
+    return next(error)
+}
+
 }
 

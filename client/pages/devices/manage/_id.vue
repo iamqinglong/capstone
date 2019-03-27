@@ -15,9 +15,9 @@
                                     <div class="col-lg-12">
                                     <div class="card-box">
                                         <div>
-                                        <h4 class="m-t-0 header-title">Devices</h4>
+                                        <h4 class="m-t-0 header-title">Events and actions</h4>
                                         <p class="text-muted font-14 m-b-20">
-                                           List of Devices
+                                           Set different actions for specific events that might occure to this device
                                         </p>
                                         <div >
                                           <nuxt-link to="/devices/create">
@@ -63,3 +63,40 @@
   	
   	</div>
 </template>
+
+<script>
+
+import style_ten from '@/static/css/style_ten.css'
+import style_thirteen from '@/static/css/style_thirteen.css'
+
+import axios from 'axios'
+
+  export default {
+    async asyncData ({ params, error }) {
+
+      
+      return await axios.get(`http://localhost:8000/api/getDeviceTechnician/${params.id}`)
+        
+    .then((res) => {
+        // let temp = JSON.stringify(res.data)
+        // JSON.parse(temp)
+        console.log(res.data)
+        return { device: res.data }
+
+    })
+    .catch((e) => {
+        
+        error({ statusCode: 404, message: 'This page is nowhere to be found' })
+    })
+    },
+    head(){
+        return {
+            title:'Edit | '
+        }
+    },
+    mounted(){
+      console.log(this.device)
+    }
+  }
+  
+</script>

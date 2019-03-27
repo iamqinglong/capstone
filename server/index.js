@@ -15,6 +15,7 @@ const web = http.createServer(app);
 const rtsIndex = require('./routes/index.router')
 const serialPort = require('serialport');
 const readLine = serialPort.parsers.Readline;
+// const session = require('express-session')
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -24,7 +25,14 @@ app.use(passport.session());
 app.use('/api',rtsIndex)
 const error = require('./error_handler/error.handler')
 app.use(error)
+// app.use(session()); // session middleware
+// app.use(require('flash')());
 
+// app.use(function (req, res) {
+//   // flash a message
+//   req.flash('info', 'hello!');
+//   next();
+// })
 
 var mqtt_port = process.env.MQTT_PORT || 1883
 // var port = process.env.HTTP_PORT || 8080
