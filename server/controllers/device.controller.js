@@ -17,10 +17,10 @@ module.exports.create = async (req,res,next) => {
           await device.save()
           return res.status(200).send({status: true , 'message':`${req.body.device_name} Created successfully`})
     } catch (error) {
-      if(error.code == 11000)
-      {
-        return res.status(422).send({status: false , 'device_name':'Already exist, Please try another'})
-      }
+      // if(error.code == 11000)
+      // {
+      //   return res.status(422).send({status: false , 'device_name':'Already exist, Please try another'})
+      // }
 
       return next(error)
     }
@@ -207,7 +207,81 @@ module.exports.getDevTech = async (req, res,next) => {
     //     //   technicians: _.pick(device.technicians,
     //     //     ['_id','firstName','lastName','phone_number'])})
     // })
-      let query =  Device.aggregate([
+    //   let query =  Device.aggregate([
+    //   {
+    //     '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
+    //   },
+    //   { '$lookup': {
+    //     'from': DeviceTechnician.collection.name,
+    //     'localField': '_id',
+    //     'foreignField': 'devId',
+    //     'as': 'technicians'
+    //   }},
+    //   { '$unwind': '$technicians' },
+    //   { '$lookup': {
+    //       'from': Technician.collection.name,
+    //       'localField': 'technicians.techId',
+    //       'foreignField': '_id',
+    //       'as': 'technicians'
+    //     }
+    //   },
+    //   { '$unwind': '$technicians' },
+    //   {"$addFields": 
+    //     {
+    //       "first_name": {
+    //           "$reduce": {
+    //               "input": {
+    //               "$map": {
+    //                   "input": {
+    //                       "$split": [
+    //                           "$technicians.first_name",
+    //                           " "
+    //                       ]
+    //                   },
+    //                   "in": {
+    //                       "$concat": [
+    //                           {
+    //                           "$toUpper": {
+    //                               "$substrCP": [
+    //                                   "$$this",
+    //                                   0,
+    //                                   1
+    //                               ]
+    //                           }
+    //                           },
+    //                           {
+    //                           "$toLower": {
+    //                               "$substrCP": [
+    //                                   "$$this",
+    //                                   1,
+    //                                   { "$strLenCP": "$$this" }
+    //                               ]
+    //                           }
+    //                           }
+    //                       ]
+    //                   }
+    //               }
+    //               },
+    //               "initialValue": "",
+    //               "in": {
+    //               "$concat": [
+    //                   "$$value",
+    //                   " ",
+    //                   "$$this"
+    //               ]
+    //               }
+    //           }
+    //       }
+    //     }
+    //   },
+    //   { '$group': {
+    //     '_id': '$_id',
+    //     'device_name': { '$first': '$device_name' },
+    //     'technicians': { '$push': '$technicians' }
+    //   }}
+    // ]);
+
+       let query =  Device.aggregate([
       {
         '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
       },
@@ -219,22 +293,118 @@ module.exports.getDevTech = async (req, res,next) => {
       }},
       { '$unwind': '$technicians' },
       { '$lookup': {
-        'from': Technician.collection.name,
-        'localField': 'technicians.techId',
-        'foreignField': '_id',
-        'as': 'technicians'
-      }},
+          'from': Technician.collection.name,
+          'localField': 'technicians.techId',
+          'foreignField': '_id',
+          'as': 'technicians',
+        }
+      },
       { '$unwind': '$technicians' },
+      {      
+          "$addFields": 
+          {
+              "technicians.first_name": {
+                  "$reduce": {
+                      "input": {
+                      "$map": {
+                          "input": {
+                              "$split": [
+                                  "$technicians.first_name",
+                                  " "
+                              ]
+                          },
+                          "in": {
+                              "$concat": [
+                                  {
+                                  "$toUpper": {
+                                      "$substrCP": [
+                                          "$$this",
+                                          0,
+                                          1
+                                      ]
+                                  }
+                                  },
+                                  {
+                                  "$toLower": {
+                                      "$substrCP": [
+                                          "$$this",
+                                          1,
+                                          { "$strLenCP": "$$this" }
+                                      ]
+                                  }
+                                  }
+                              ]
+                          }
+                      }
+                      },
+                      "initialValue": "",
+                      "in": {
+                      "$concat": [
+                          "$$value",
+                          " ",
+                          "$$this"
+                      ]
+                      }
+                  }
+              },
+              "technicians.last_name": {
+                  "$reduce": {
+                      "input": {
+                      "$map": {
+                          "input": {
+                              "$split": [
+                                  "$technicians.last_name",
+                                  " "
+                              ]
+                          },
+                          "in": {
+                              "$concat": [
+                                  {
+                                  "$toUpper": {
+                                      "$substrCP": [
+                                          "$$this",
+                                          0,
+                                          1
+                                      ]
+                                  }
+                                  },
+                                  {
+                                  "$toLower": {
+                                      "$substrCP": [
+                                          "$$this",
+                                          1,
+                                          { "$strLenCP": "$$this" }
+                                      ]
+                                  }
+                                  }
+                              ]
+                          }
+                      }
+                      },
+                      "initialValue": "",
+                      "in": {
+                      "$concat": [
+                          "$$value",
+                          " ",
+                          "$$this"
+                      ]
+                      }
+                  }
+              },
+          },
+        },
+      
       { '$group': {
         '_id': '$_id',
         'device_name': { '$first': '$device_name' },
         'technicians': { '$push': '$technicians' }
       }}
     ]);
+
     
     // return res.status(200).send( { device, technicians: device.technicians })
      query.exec((err, device) => {
-        return res.status(200).json( device )
+        return res.status(200).send( {status: true, device} )
     })
   } catch (error) {
       // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})

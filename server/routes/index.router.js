@@ -23,7 +23,7 @@ router.get('/getTechnician/:id', crtlTech.get)
 router.get('/getAllTechnician', crtlTech.getAll)
 router.get('/getTechnicianDevices/:id', crtlTech.getTechDev)
 router.put('/updateTechnician/:id', crtlTech.update)
-router.delete('/deleteTechnician/:id', crtlTech.delete)
+router.delete('/deleteTech/:id', crtlTech.delete)
 
 const ctrlDevTech = require('../controllers/deviceTechnician.controller')
 router.post('/createDevTech', ctrlDevTech.create)

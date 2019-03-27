@@ -15,9 +15,9 @@
                                     <div class="col-lg-12">
                                     <div class="card-box">
                                         <div>
-                                          <h4 class="m-t-0 header-title">Devices</h4>
+                                          <h4 class="m-t-0 header-title">Technicians</h4>
                                           <p class="text-muted font-14 m-b-20">
-                                             List of Devices
+                                             List of Technicians
                                           </p>
                                           <div >
                                             <nuxt-link to="/technicians/create">
@@ -34,7 +34,8 @@
                                             <span slot="actions" slot-scope="{row}"> 
                                                 <!-- <button v-on:click="edit(row.id)">Edit</button> -->
                                                 <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
-                                                <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
+                                                <a  @click.prevent="deleteDevice(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
+                                                <!-- <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link> -->
                                             </span>
 
                                            </v-client-table>
@@ -163,7 +164,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteDevice/${id}`)
+                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTech/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -181,15 +182,11 @@ export default {
                                 text: `${res.data.message}`,
                                 type: 'success',
                             })
-                            this.$router.push('/devices');
+                            this.$router.push('/technicians');
                             // console.log(result)
                         }
 
-                        // this.$swal.fire(
-                        // 'Deleted!',
-                        // 'Your file has been deleted.',
-                        // 'success'
-                        // )
+                        
                     }
                 
             } catch (error) {

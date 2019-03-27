@@ -31,6 +31,7 @@
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Data Source</label>
                                                             <input v-model.trim="device.data_source" type="text" class="form-control" id="" placeholder="Data Source">
+                                                            <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">

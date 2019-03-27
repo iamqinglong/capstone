@@ -25,11 +25,12 @@
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">First Name</label>
                                                             <input  v-model.trim="form.first_name" class="form-control" id="" placeholder="First Name" >
-                                                          
+                                                            <small class="form-text text-danger" v-if="errors.first_name">{{errors.first_name}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Last Name</label>
                                                             <input v-model.trim="form.last_name" type="text" class="form-control" id="" placeholder="Last Name">
+                                                            <small class="form-text text-danger" v-if="errors.last_name">{{errors.last_name}}</small>   
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -51,7 +52,7 @@
                 </div> <!-- end container -->
         </div>
         <!-- Footer -->
-        <footer class="footer">
+        <!-- <footer class="footer">
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
@@ -59,7 +60,7 @@
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer> -->
         <!-- End Footer -->
     </div>
 </template>
@@ -82,11 +83,11 @@ export default {
         async create () {
             try {
                 console.log(this.form)
-                let result = await this.$axios.post('http://localhost:8000/api/createDevice/',{
+                let result = await this.$axios.post('http://localhost:8000/api/createTech/',{
 
-                    device_name: this.form.device_name,
-                    data_source: this.form.data_source,
-                    location: this.form.location
+                    first_name: this.form.first_name,
+                    last_name: this.form.last_name,
+                    phone_number: this.form.phone_number
 
                 })
                 
@@ -97,7 +98,7 @@ export default {
                         confirmButtonText: 'Ok'
                     })
 
-                this.$router.push('/devices');
+                this.$router.push('/technicians');
             } catch (error) {
                 console.log(error)
             }

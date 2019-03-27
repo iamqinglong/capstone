@@ -45,7 +45,7 @@
                                                     <nuxt-link :to="'/devices/' + device._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
                                                     <!-- <nuxt-link :to="'/devices/delete/' + device._id" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></nuxt-link> -->
                                                     <a  @click.prevent="deleteDevice(device._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
-                                                    <nuxt-link :to="'/devices/manage/' + device._id" href="" class="hidden on-editing cancel-row" v-b-tooltip.hover title="Manage"><i class="fa fa-times"></i></nuxt-link>
+                                                    <nuxt-link :to="'/devices/manage/' + device._id" href="" class="hidden on-editing cancel-row" v-b-tooltip.hover title="Manage"><i class="mdi mdi-av-timer"></i></nuxt-link>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -61,7 +61,7 @@
             </div> <!-- end container -->
       </div>
       <!-- Footer -->
-      <footer class="footer">
+      <!-- <footer class="footer">
           <div class="container">
               <div class="row">
                   <div class="col-12 text-center">
@@ -69,7 +69,7 @@
                   </div>
               </div>
           </div>
-      </footer>
+      </footer> -->
       <!-- End Footer -->
   	
   	</div>

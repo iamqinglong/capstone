@@ -26,11 +26,12 @@
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">First Name</label>
                                                             <input  v-model.trim="tech.first_name" class="form-control" id="" placeholder="First Name" >
-                                                          
+                                                            <small class="form-text text-danger" v-if="errors.first_name">{{errors.first_name}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Last Name</label>
                                                             <input v-model.trim="tech.last_name" type="text" class="form-control" id="" placeholder="Last Name">
+                                                            <small class="form-text text-danger" v-if="errors.last_name">{{errors.last_name}}</small>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -76,10 +77,10 @@ export default {
             // error : ''
         }
     },
-    validate ({ params }) {
-        // Must be a number
-        return params.id
-    },
+    // validate ({ params }) {
+    //     // Must be a number
+    //     return params.id
+    // },
     asyncData ({ params, error }) {
 
         // const [ acct, perms ] = await Promise.all([getUserAccount(), getUserPermissions()])
@@ -88,7 +89,7 @@ export default {
         // return {device : result.device}
         
     .then((res) => {
-        // console.log(res.data.device[0]._id)
+        console.log(res.data.technician[0]._id)
         return { 
                 tech: {
                     id : res.data.technician[0]._id,
@@ -109,7 +110,7 @@ export default {
     .catch((e) => {
         
         // console.log(e)
-        error({ statusCode: 404, message: 'Device not found' })
+        error({ statusCode: 404, message: 'Technician not found' })
     })
     },
     head(){
@@ -172,7 +173,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteDevice/${this.device.id}`)
+                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTechnician/${this.tech.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
