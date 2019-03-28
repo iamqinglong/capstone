@@ -41,5 +41,12 @@ deviceSchema.virtual('technicians', {
     justOne: false // set true for one-to-one relationship
 })
 
+deviceSchema.virtual('events', {
+    ref: 'DeviceEvent',
+    localField: '_id',
+    foreignField: 'devId',
+    justOne: false // set true for one-to-one relationship
+})
+
 deviceSchema.plugin(uniqueValidator, { message: 'Error, {VALUE} is already acquired' });
 mongoose.model('Device', deviceSchema)

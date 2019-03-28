@@ -13,13 +13,6 @@ module.exports.create = (req,res,next) => {
         }
     );
 
-    // devTech.save(function (err) {
-    //     if (err) {
-    //         return next(err);
-    //     }
-    //     res.send('DeviceTechnician Created successfully')
-    // })
-
     DeviceTechnician.update({devId: devTech.devId, techId: devTech.techId},
         {},
         {'upsert': true},

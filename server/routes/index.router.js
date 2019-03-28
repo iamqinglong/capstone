@@ -29,5 +29,8 @@ router.delete('/deleteTech/:id', crtlTech.delete)
 const ctrlDevTech = require('../controllers/deviceTechnician.controller')
 router.post('/createDevTech', ctrlDevTech.create)
 
+const ctrlEvent = require('../controllers/event.controller')
+router.post('/createEvent/:id', ctrlEvent.create)
+
 
 module.exports = router

@@ -417,32 +417,52 @@ module.exports.getAllNotDevTech = async (req, res,next) => {
 
 try {
     
-      let query =  Device.aggregate([
-      {
-        '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
-      },
+      let query =  Technician.aggregate([
       { '$lookup': { 'from': DeviceTechnician.collection.name,
-        'localField': '_id',
-        'foreignField': 'devId',
-        'as': 'technicians1st'
+        // 'localField': '_id',
+        // 'foreignField': 'techId',
+        let: {'id': '$_id',},
+                pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    // Weird but `$expr` must have exactly one key, so you need to
+                    // use `$and`, otherwise you get an error 'MongoError: An
+                    // object representing an expression must have exactly one field'
+                    $and: [
+                      // Fields prefixed with one '$' are in the 'Stock' collection,
+                      // that is, the `from` collection. Fields prefixed with '$$'
+                      // are from the `let` above
+                      {
+                        $eq: ['$techId', '$$id']
+                      },
+                      { $eq: ['$devId', mongoose.Types.ObjectId(req.params.id)] }
+                    ]
+                  }
+                }
+              }
+            ],
+        'as': 'devices'
       }},
+      {
+        $unwind: {
+            path: "$devices.devices",
+            preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $match: { "devices": { $eq: [] } }
+      },
 
-      { '$unwind': '$technicians1st' },
-      // { '$lookup': {
-      //     'from': Technician.collection.name,
-      //     'localField': 'technicians1st.techId',
-      //     'foreignField': '_id',
-      //     'as' : 'technicians2nd'
-      // }},
-
-      // { '$unwind': '$technicians2nd' },
-      // { '$group': {
-      //   '_id': '$_id',
-      //   'device_name': { '$first': '$device_name' },
-      //   'technicians': { '$push': '$technicians2nd' }
-      // }}
+      { '$group': {
+        '_id': '$_id',
+        'first_name': { '$first': '$first_name' },
+        'last_name': { '$first': '$last_name' },
+        'phone_number': { '$first': '$phone_number' },
+        // 'technicians': { '$push': '$technicians' }
+      }}
     ]);
-    
+
     // return res.status(200).send( { device, technicians: device.technicians })
     query.exec((err, technician) => {
         return res.status(200).json( technician )

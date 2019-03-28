@@ -28,10 +28,9 @@
                                         <table class="table">
                                             <thead class="thead-dark">
                                             <tr>
-                                                <th>#</th>
-                                                <th>Device Name</th>
-                                                <th>Data Source</th>
-                                                <th>Location</th>
+                                                <th>Condition</th>
+                                                <th>Statement</th>
+                                                <th>Value</th>
                                                 <th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Actions" style="width: 223.2px;">Actions</th>
                                             </tr>
                                             </thead>
@@ -91,7 +90,7 @@ import axios from 'axios'
     },
     head(){
         return {
-            title:'Edit | '
+            title:'Manage | ' + this.device[0].device_name
         }
     },
     mounted(){
