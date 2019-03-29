@@ -40,3 +40,43 @@ module.exports.create = async (req,res,next) => {
     
     
 }
+
+module.exports.getAll = async (req, res,next) => {
+
+  try {
+
+       let query =  Device.aggregate([
+      {
+        '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
+      },
+      { '$lookup': {
+        'from': DeviceTechnician.collection.name,
+        'localField': '_id',
+        'foreignField': 'devId',
+        'as': 'technicians'
+      }},
+      { '$unwind': '$events' },
+      { '$lookup': {
+          'from': Event.collection.name,
+          'localField': 'technicians.evId',
+          'foreignField': '_id',
+          'as': 'events',
+        }
+      },
+      { '$unwind': '$events' },
+         { '$group': {
+        '_id': '$_id',
+        'device_name': { '$first': '$device_name' },
+        'technicians': { '$push': '$technicians' }
+      }}
+      ]);
+      query.exec((err, device) => {
+        return res.status(200).send( device )
+    })
+  } catch (error) {
+      // res.status(500).send(error)
+      return next(error)
+  }
+ 
+}
+

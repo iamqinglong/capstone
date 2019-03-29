@@ -40,7 +40,7 @@
                                                     </div>
                                                    
                                                     <button @click.prevent="update" type="submit" class="btn btn-primary">Update Technician</button>
-                                                    <button @click.prevent="deleteDevice" type="submit" class="btn btn-danger">Delete Technician</button>
+                                                    <button @click.prevent="deleteTech" type="submit" class="btn btn-danger">Delete Technician</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning">Cancel</button>
                                                 </form>
                                             </div>
@@ -147,7 +147,7 @@ export default {
 
                     })
 
-                    this.$router.push('/technicians');
+                    this.$router.back()
                 } catch (error) {
 
                     console.log(error.message)
@@ -157,7 +157,7 @@ export default {
            
         },
 
-        async deleteDevice (){
+        async deleteTech (){
             try {
                
                  const {value: result}  = await this.$swal.fire({
@@ -173,7 +173,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTechnician/${this.tech.id}`)
+                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTech/${this.tech.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -191,15 +191,9 @@ export default {
                                 text: `${res.data.message}`,
                                 type: 'success',
                             })
-                            this.$router.push('/devices');
-                            // console.log(result)
+                            this.$router.back()
                         }
 
-                        // this.$swal.fire(
-                        // 'Deleted!',
-                        // 'Your file has been deleted.',
-                        // 'success'
-                        // )
                     }
                
 
@@ -210,7 +204,7 @@ export default {
         },
         async cancel (){
             try {
-                 this.$router.push('/technicians');
+                 this.$router.back()
             } catch (error) {
                 console.log(error)
             }

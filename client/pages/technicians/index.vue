@@ -34,7 +34,7 @@
                                             <span slot="actions" slot-scope="{row}"> 
                                                 <!-- <button v-on:click="edit(row.id)">Edit</button> -->
                                                 <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
-                                                <a  @click.prevent="deleteDevice(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
+                                                <a  @click.prevent="deleteTech(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
                                                 <!-- <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link> -->
                                             </span>
 
@@ -144,10 +144,9 @@ export default {
     },
     async mounted() {
       this.data = this.technician
-      // console.log(this.technician)
     },
     methods: {
-         async deleteDevice (id){
+         async deleteTech (id){
             try {
                
               

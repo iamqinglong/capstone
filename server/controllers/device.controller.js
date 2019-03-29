@@ -404,7 +404,7 @@ module.exports.getDevTech = async (req, res,next) => {
     
     // return res.status(200).send( { device, technicians: device.technicians })
      query.exec((err, device) => {
-        return res.status(200).send( device )
+        return res.status(200).send( {status: true, device: device} )
     })
   } catch (error) {
       // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
