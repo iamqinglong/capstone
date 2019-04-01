@@ -9,9 +9,9 @@ export const getters = {
     }
   }
 
-  export const state = () => ({
-    busy: false,
-    loggedIn: false,
-    strategy: "local",
-    user: false,
-    })
+export const state = () => ({
+  busy: false,
+  loggedIn: false,
+  strategy: "local",
+  user: false,
+  })

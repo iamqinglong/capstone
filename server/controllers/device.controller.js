@@ -5,14 +5,23 @@ const Technician = mongoose.model('Technician')
 var Schema = mongoose.Schema;
 const _ = require('lodash')
 
+function capital_letter(str) 
+{
+    str = str.split(" ");
+
+    for (let i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+    return str.join(" ");
+}
 module.exports.create = async (req,res,next) => {
-    // res.send('Greetings from the Device controller!');
 
     try {
           let device = new Device({
-              device_name: req.body.device_name,
+              device_name: capital_letter(req.body.device_name),
               data_source: req.body.data_source,
-              location: req.body.location,
+              location: capital_letter(req.body.location),
           });
           await device.save()
           return res.status(200).send({status: true , 'message':`${req.body.device_name} Created successfully`})
@@ -163,11 +172,15 @@ module.exports.update = async (req, res,next) => {
 
   try {
       const id = req.params.id
-      const device = req.body
+      const device = {
+        device_name: capital_letter(req.body.device_name),
+        data_source: req.body.data_source,
+        location: capital_letter(req.body.location),
+      }
       const { ...updateData } = device
-      const update = await Device.update({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
+      const update = await Device.findOneAndUpdate({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
       // const update = await Device.findOneAndUpdate(id, updateData, { new: true, runValidators: true, context: 'query' })
-      return res.status(200).send( update )
+      return res.status(200).send( {status: true, 'message': `${update.device_name} Update successfully`} )
       // let result = await Device.findOneAndUpdate(req.params.id,
       //   {
 
@@ -393,7 +406,7 @@ module.exports.getDevTech = async (req, res,next) => {
               },
           },
         },
-      
+      { '$unwind': '$technicians' },
       { '$group': {
         '_id': '$_id',
         'device_name': { '$first': '$device_name' },
@@ -465,7 +478,7 @@ try {
 
     // return res.status(200).send( { device, technicians: device.technicians })
     query.exec((err, technician) => {
-        return res.status(200).json( technician )
+        return res.status(200).send( {status:true, technician: technician} )
     })
 } catch (error) {
     // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
@@ -474,3 +487,31 @@ try {
 
 }
 
+module.exports.addTechnician = async (req, res,next) => {
+
+  try {
+      let devId = mongoose.Types.ObjectId(req.params.id);
+      let techIds = JSON.parse(req.body.techIds);
+      techIds.forEach(element => {
+
+        DeviceTechnician.findOneAndUpdate({devId: devId, techId: element},
+          {},
+          {'upsert': true},
+          // function (err, doc) {
+          //     if(err){
+          //         return next(err)
+          //     }
+          //     res.send(doc)
+          // }
+          );
+
+      });
+        
+      return res.status(200).send( { status: true, techIds: techIds})
+     
+  } catch (error) {
+      // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
+      return next(error)
+  }
+  
+  }

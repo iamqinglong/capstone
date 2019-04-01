@@ -82,7 +82,7 @@ import Devices from '@/components/Devices.vue'
 import style_ten from '@/static/css/style_ten.css'
 import style_thirteen from '@/static/css/style_thirteen.css'
 
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   middleware: 'auth',
@@ -92,18 +92,22 @@ export default {
   computed: {
     // ...mapGetters(['loggedInUser']),
   },
-   asyncData ({ params, error }) {
+   asyncData ({ params, error , $axios}) {
 
-        return axios.get('http://localhost:8000/api/getAllDevice')
+        return $axios.get('/getAllDevice')
 
     .then((res) => {
-        console.log(res.data)
         return { devices : res.data}
 
     })
     .catch((e) => {
         
-        console.log(e)
+        this.$swal.fire({
+                                title: 'Error!',
+                                text: `${e.message}`,
+                                type: 'error',
+                                confirmButtonText: 'Ok'
+                            })
 
     })
     },
@@ -125,7 +129,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteDevice/${id}`)
+                        let res = await this.$axios.delete(`/deleteDevice/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -143,22 +147,27 @@ export default {
                                 text: `${res.data.message}`,
                                 type: 'success',
                             })
+                            this.getData();
                             this.$router.push('/devices');
-                            // console.log(result)
                         }
 
-                        // this.$swal.fire(
-                        // 'Deleted!',
-                        // 'Your file has been deleted.',
-                        // 'success'
-                        // )
+                        
                     }
                 
             } catch (error) {
-                console.log(error)
+                this.$swal.fire({
+                                title: 'Error!',
+                                text: `${error.message}`,
+                                type: 'error',
+                                confirmButtonText: 'Ok'
+                            })
             }
            
         },
+        async getData() {
+            let res = await this.$axios.get('/getAllDevice')
+            this.devices = res.data
+        }
     },
     
 };

@@ -18,14 +18,14 @@ const technicianSchema = new mongoose.Schema({
     first_name :{
         type: String,
         unique: true,
-        lowercase: true,
+        // lowercase: true,
         required: `First name can't be empty`,
         validate: nameValidator
     },
     last_name: {
         type: String,
         required: `Last name can't be empty`,
-        lowercase: true,
+        // lowercase: true,
         unique: true,
         validate: nameValidator
     },

@@ -7,32 +7,26 @@ const DeviceTechnician = mongoose.model('DeviceTechnician')
 const passport = require('passport')
 const _ = require('lodash')
 
+function capital_letter(str) 
+{
+    str = str.split(" ");
+
+    for (let i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+    return str.join(" ");
+}
 module.exports.create = async (req,res,next) => {
-    // res.send('Greetings from the Device controller!');
+    
 
-    // let tech = new Technician(
-    //     {
-
-    //         first_name: req.body.first_name,
-    //         last_name: req.body.last_name,
-    //         phone_number: req.body.phone,
-
-    //     }
-    // );
-
-    // tech.save(function (err) {
-    //     if (err) {
-    //         return next(err);
-    //     }
-    //     res.send('Technician Created successfully')
-    // })
     try {
         let tech = new Technician(
             {
     
-                first_name: req.body.first_name,
-                last_name: req.body.last_name,
-                phone_number: req.body.phone,
+                first_name: capital_letter(req.body.first_name),
+                last_name: capital_letter(req.body.last_name),
+                phone_number: req.body.phone_number,
     
             }
         );
@@ -45,127 +39,35 @@ module.exports.create = async (req,res,next) => {
     
 }
 
+function map() {
+    
+   let map = {"$map": {
+            "input": { "$split": [ "$first_name", " " ] },
+            "as": "name",
+            "in": {                                                                             
+                "$concat": [
+                    { "$toUpper": { "$substrCP": ["$$name", 0, 1] } }, 
+                    {                                                           
+                        "$substrCP": [
+                            "$$name",
+                            1,
+                            { "$subtract": [{ "$strLenCP": "$$name" }, 1 ]}
+                        ] 
+                    }
+                ]
+            }
+        }
+    }
 
+    return map;
+}
 module.exports.get = async (req, res, next) => {
-    // const query = Technician.findById(req.params.id).populate('devices')
-
-    // query.exec((err, technicians) => {
-    //     return res.status(200).json( { technicians, device: technicians.devices })
-    // })
-    // try {
-
-    //     let technician = await Technician.find({ _id: mongoose.Types.ObjectId(req.params.id)}).limit(1).exec();
-    //     if(technician.length)
-    //     {
-    //       res.status(200).send( {status: true, technician } )
-    //     }
-    //     else res.status(404).send( {status: false, 'message': 'Technician not found'})
         
-  
-    //   } catch (error) {
-  
-        
-    //     return next(error)
-  
-    //   }
         try {
             let query = Technician.aggregate([
                 {
                     '$match': { _id : mongoose.Types.ObjectId(req.params.id) }
                 },
-                {
-                    
-                "$addFields": {
-                    "first_name": {
-                        "$reduce": {
-                            "input": {
-                            "$map": {
-                                "input": {
-                                    "$split": [
-                                        "$first_name",
-                                        " "
-                                    ]
-                                },
-                                "in": {
-                                    "$concat": [
-                                        {
-                                        "$toUpper": {
-                                            "$substrCP": [
-                                                "$$this",
-                                                0,
-                                                1
-                                            ]
-                                        }
-                                        },
-                                        {
-                                        "$toLower": {
-                                            "$substrCP": [
-                                                "$$this",
-                                                1,
-                                                { "$strLenCP": "$$this" }
-                                            ]
-                                        }
-                                        }
-                                    ]
-                                }
-                            }
-                            },
-                            "initialValue": "",
-                            "in": {
-                            "$concat": [
-                                "$$value",
-                                " ",
-                                "$$this"
-                            ]
-                            }
-                        }
-                    },
-                    "last_name": {
-                        "$reduce": {
-                            "input": {
-                            "$map": {
-                                "input": {
-                                    "$split": [
-                                        "$last_name",
-                                        " "
-                                    ]
-                                },
-                                "in": {
-                                    "$concat": [
-                                        {
-                                        "$toUpper": {
-                                            "$substrCP": [
-                                                "$$this",
-                                                0,
-                                                1
-                                            ]
-                                        }
-                                        },
-                                        {
-                                        "$toLower": {
-                                            "$substrCP": [
-                                                "$$this",
-                                                1,
-                                                { "$strLenCP": "$$this" }
-                                            ]
-                                        }
-                                        }
-                                    ]
-                                }
-                            }
-                            },
-                            "initialValue": "",
-                            "in": {
-                            "$concat": [
-                                "$$value",
-                                " ",
-                                "$$this"
-                            ]
-                            }
-                        }
-                    },
-                },
-                }
             ]
         )
         query.exec((err, technician) => {
@@ -357,7 +259,12 @@ module.exports.update = async (req, res,next) => {
     // }
     try {
       const id = req.params.id
-      const technician = req.body
+      const technician = {
+            first_name: capital_letter(req.body.first_name),
+            last_name: capital_letter(req.body.last_name),
+            phone_number: req.body.phone_number
+      }
+
       const { ...updateData } = technician
       const update = await Technician.update({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
       return res.status(200).send( update )

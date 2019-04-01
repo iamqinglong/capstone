@@ -83,7 +83,7 @@ export default {
         async create () {
             try {
                 console.log(this.form)
-                let result = await this.$axios.post('http://localhost:8000/api/createTech/',{
+                let result = await this.$axios.post('/createTech/',{
 
                     first_name: this.form.first_name,
                     last_name: this.form.last_name,

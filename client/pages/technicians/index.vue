@@ -28,10 +28,9 @@
                                         <br>
                                         <div>
                                            <v-client-table :data="data" :columns="columns" :options="options"> 
-                                            <!--  <a slot="email" slot-scope="props" :href="`mailto:${props.row.email}`">
-                                              {{props.row.email}}
-                                            </a> -->
-                                            <span slot="actions" slot-scope="{row}"> 
+                                            
+                                            <span slot="actions" slot-scope="{row}">
+                                              
                                                 <!-- <button v-on:click="edit(row.id)">Edit</button> -->
                                                 <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
                                                 <a  @click.prevent="deleteTech(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
@@ -73,14 +72,10 @@ import Devices from '@/components/Devices.vue'
 import style_ten from '@/static/css/style_ten.css'
 import style_thirteen from '@/static/css/style_thirteen.css'
 
-import axios from 'axios'
+// import axios from 'axios'
 import Vue from 'vue'
 import {ClientTable, Event} from 'vue-tables-2';
 Vue.use(ClientTable);
-// import daterangepicker from 'daterangepicker';
-//This is very important to used with the window object
-// window.moment = require('moment')
-// import moment from 'moment'
 
 export default {
   middleware: 'auth',
@@ -127,12 +122,11 @@ export default {
               },
             }   
         },
-    async asyncData ({ params, error }) {
+    async asyncData ({ params, error, $axios }) {
 
-        return await axios.get('http://localhost:8000/api/getAllTechnician')
+        return await $axios.get('/getAllTechnician')
 
     .then((res) => {
-        console.log(res.data)
         return { technician : res.data}
 
     })
@@ -163,7 +157,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTech/${id}`)
+                        let res = await this.$axios.delete(`/deleteTech/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -175,7 +169,7 @@ export default {
 
                         }
                         else{
-                        
+                            this.getData();
                             this.$swal.fire({
                                 title: 'Deleted!',
                                 text: `${res.data.message}`,
@@ -194,17 +188,9 @@ export default {
            
         },
         
-        getData() {
-          const arr = []
-          for (var i = 0; i < 20; i++) {
-            arr.push({
-              '_id': i,
-              'first_name': `first sample${i}`,
-              'last_name': `last sample${i}`,
-              'phone_number': `${i}`
-            });
-          }
-          return arr;
+        async getData() {
+            let res = await this.$axios.get('/getAllTechnician');
+            this.data = res.data;
         }
     },
     

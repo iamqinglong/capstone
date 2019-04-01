@@ -71,25 +71,18 @@ import axios from 'axios'
 export default {
     data() {
         return {
-            // name : 'Test',
-            // data_source : '',
-            // location : '',
-            // error : ''
+           
         }
     },
     // validate ({ params }) {
     //     // Must be a number
     //     return params.id
     // },
-    asyncData ({ params, error }) {
+    asyncData ({ params, error, $axios }) {
 
-        // const [ acct, perms ] = await Promise.all([getUserAccount(), getUserPermissions()])
-      return axios.get(`http://localhost:8000/api/getTechnician/${params.id}`)
-        // console.log(result.device)
-        // return {device : result.device}
+      return $axios.get(`/getTechnician/${params.id}`)
         
     .then((res) => {
-        console.log(res.data.technician[0]._id)
         return { 
                 tech: {
                     id : res.data.technician[0]._id,
@@ -109,7 +102,6 @@ export default {
     })
     .catch((e) => {
         
-        // console.log(e)
         error({ statusCode: 404, message: 'Technician not found' })
     })
     },
@@ -119,7 +111,6 @@ export default {
         }
     },
     mounted() {
-        //  console.log(this.device_name)
     },
    
     methods: {
@@ -129,7 +120,7 @@ export default {
            if(result)
            {
                 this.$swal.fire({
-                    title: 'No Change!',
+                    title: 'Unchange!',
                     text: 'No changes was detected',
                     type: 'error',
                     confirmButtonText: 'Ok'
@@ -139,7 +130,7 @@ export default {
            {
                 try {
 
-                    await this.$axios.put(`http://localhost:8000/api/updateTechnician/${this.tech.id}`, {
+                    await this.$axios.put(`/updateTechnician/${this.tech.id}`, {
 
                         first_name: this.tech.first_name,
                         last_name: this.tech.last_name,
@@ -173,7 +164,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteTech/${this.tech.id}`)
+                        let res = await this.$axios.delete(`/deleteTech/${this.tech.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({

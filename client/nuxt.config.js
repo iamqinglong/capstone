@@ -54,6 +54,7 @@ export default {
     'plugins/mixins/user.js',
     'plugins/axios.js',
     'plugins/mixins/validation.js',
+    // 'plugins/vue-js-modal.js',
   ],
 
   /*

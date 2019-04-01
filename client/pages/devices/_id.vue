@@ -81,12 +81,9 @@ export default {
         // Must be a number
         return params.id
     },
-    asyncData ({ params, error }) {
+    async asyncData ({ params, error, $axios}) {
 
-        // const [ acct, perms ] = await Promise.all([getUserAccount(), getUserPermissions()])
-      return axios.get(`http://localhost:8000/api/getDevice/${params.id}`)
-        // console.log(result.device)
-        // return {device : result.device}
+      return await $axios.get(`/getDevice/${params.id}`)
         
     .then((res) => {
         // console.log(res.data.device[0]._id)
@@ -118,23 +115,8 @@ export default {
         }
     },
     mounted() {
-        //  console.log(this.device_name)
     },
-    // computed: {
-    //     // I just want to watch title for now
-    //     device: () => {
-    //         return this.deviceChanged;
-    //     }
-    // },
-    // watch: {
-    //     device: {
-    //     handler(val, oldVal){
-    //       console.log('Item Changed')
-    //       console.log(val)
-    //     },
-    //     deep: true
-    //   }
-    // },  
+    
     methods: {
         async update (){
 
@@ -142,7 +124,7 @@ export default {
            if(result)
            {
                 this.$swal.fire({
-                    title: 'No Change!',
+                    title: 'Unchange!',
                     text: 'No changes was detected',
                     type: 'error',
                     confirmButtonText: 'Ok'
@@ -152,14 +134,18 @@ export default {
            {
                 try {
 
-                    await this.$axios.put(`http://localhost:8000/api/updateDevice/${this.device.id}`, {
+                    let res = await this.$axios.put(`/updateDevice/${this.device.id}`, {
 
                          device_name: this.device.device_name,
                         data_source: this.device.data_source,
                         location: this.device.location
 
                     })
-
+                    this.$swal.fire({
+                                title: 'Updated!',
+                                text: `${res.data.message}`,
+                                type: 'success',
+                            })
                     this.$router.push('/devices');
                 } catch (error) {
 
@@ -186,7 +172,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteDevice/${this.device.id}`)
+                        let res = await this.$axios.delete(`/deleteDevice/${this.device.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({

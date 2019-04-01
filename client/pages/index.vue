@@ -40,7 +40,6 @@
 
 <script >
 import Chart from '@/components/Chart.vue'
-import axios from 'axios'
 export default {
     components: {
         chart: Chart
@@ -63,9 +62,9 @@ export default {
         //         }
         }
     },
-    asyncData ({ params, error }) {
+    async asyncData ({ params, error, $axios }) {
 
-        return axios.get('http://localhost:8000/api/getAllDevice')
+        return $axios.get('/getAllDevice')
 
         .then((res) => {
             // console.log(res.data)

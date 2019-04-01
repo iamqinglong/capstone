@@ -18,6 +18,7 @@ router.get('/getDeviceTechnician/:id', crtlDevice.getDevTech)
 router.delete('/deleteDevice/:id', crtlDevice.delete)
 router.put('/updateDevice/:id', crtlDevice.update)
 router.get('/getAllNotDeviceTechnician/:id', crtlDevice.getAllNotDevTech)
+// router.post('/addTechnician/:id', crtlDevice.addTechnician)
 
 router.post('/createTech', crtlTech.create)
 router.get('/getTechnician/:id', crtlTech.get)
@@ -27,10 +28,14 @@ router.put('/updateTechnician/:id', crtlTech.update)
 router.delete('/deleteTech/:id', crtlTech.delete)
 
 const ctrlDevTech = require('../controllers/deviceTechnician.controller')
-router.post('/createDevTech', ctrlDevTech.create)
+router.post('/createDevTech/:id', ctrlDevTech.create)
+router.post('/deleteDevTech', ctrlDevTech.delete)
 
 const ctrlEvent = require('../controllers/event.controller')
 router.post('/createEvent/:id', ctrlEvent.create)
-
+router.get('/getDeviceEvent/:id', ctrlEvent.getAll)
+router.post('/deleteEvent', ctrlEvent.delete)
+router.get('/getEvent/:id', ctrlEvent.get)
+router.post('/updateEvent/:id', ctrlEvent.update)
 
 module.exports = router

@@ -15,31 +15,33 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="card-box">
-                                                <h4 class="m-t-0 header-title">Device general information</h4>
+                                                <h4 class="m-t-0 header-title">Event general information</h4>
                                                 <p class="text-muted m-b-30 font-13">
-                                                    Here you can modify display name or other general information
+                                                    Here you can modify/set your action or other general information
                                                 </p>
 
                                                 <form>
                                                     <div class="form-row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Device Name</label>
-                                                            <input v-model.trim="form.device_name" type="text" required="" class="form-control" id="" placeholder="Device Name">
-                                                            <small class="form-text text-danger" v-if="errors.device_name">{{errors.device_name}}</small>
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Condition</label>
+                                                            <b-form-select v-model="selectedCondition" :options="optionsCondition"></b-form-select>
                                                         </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Data Source</label>
-                                                            <input v-model.trim="form.data_source" type="text" required="" class="form-control" id="" placeholder="Data Source">
-                                                            <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Statement</label>
+                                                            <b-form-select v-model="selectedStatement" :options="optionsStatement"></b-form-select>
+                                                        </div>
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Value</label>
+                                                            <input v-model="value" type="number" required="" class="form-control" id="" placeholder="">
+                                                        </div>
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Actions</label>
+                                                            <b-form-select v-model="selectedActions" :options="optionsActions"></b-form-select>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="" class="col-form-label">Location</label>
-                                                        <input v-model.trim="form.location" type="text" required="" class="form-control" id="" placeholder="Set device location">
-                                                        <small class="form-text text-danger" v-if="errors.location">{{errors.location}}</small>
-                                                    </div>
-                                                   
-                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Device</button>
+                                                    
+                                            
+                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Event</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
                                                 </form>
                                             </div>
@@ -72,12 +74,31 @@ export default {
     middleware: 'auth',
     data() {
         return {
-            form : {
-                device_name: '',
-                data_source: '',
-                location: '',
-            }
+            value: 1,
+            selectedCondition: 'if',
+            optionsCondition: [
+            { value: 'if', text: 'If' },
+            { value: 'if_not', text: 'If not' },
+            ],
+            selectedStatement: 'if',
+            optionsStatement: [
+            { value: 'if', text: 'If' },
+            { value: 'if_not', text: 'If not' },
+            ],
+            selectedValue: 'if',
+            optionsValue: [
+            { value: 'if', text: 'If' },
+            { value: 'if_not', text: 'If not' },
+            ],
+            selectedActions: 'if',
+            optionsActions: [
+            { value: 'if', text: 'If' },
+            { value: 'if_not', text: 'If not' },
+            ],
         }
+    },
+    async asyncData({params, error}) {
+        return params.id
     },
     methods: {
         async create () {
