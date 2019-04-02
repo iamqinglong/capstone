@@ -123,6 +123,10 @@
                                 <li v-if="authenticated" class="has-submenu">
                                 <nuxt-link to="/technicians">Technician</nuxt-link>
                              </li>
+                             </li>
+                                <li v-if="authenticated" class="has-submenu">
+                                <nuxt-link to="/notification">Notifications</nuxt-link>
+                             </li>
                              <li v-if="!authenticated" class="has-submenu">
                              <!-- <li  v-if="!isAuthenticated" class="has-submenu">     -->
                                 <!-- <a href="/devices"><i class="ti-home"></i>Devices</a> -->
