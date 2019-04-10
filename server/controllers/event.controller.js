@@ -271,3 +271,52 @@ module.exports.update = async ( req, res, next ) => {
     
   }
 }
+
+module.exports.getAllByTopic = async (req, res,next) => {
+
+  try {
+      // res.send(req.query.topic)
+      let device = await Device.aggregate([
+      {
+        '$match': { data_source : req.query.topic }
+      },
+      { '$lookup': {
+        'from': DeviceEvent.collection.name,
+        'localField': '_id',
+        'foreignField': 'devId',
+        'as': 'events'
+      }},
+      { '$unwind': '$events' },
+      { '$lookup': {
+          'from': Event.collection.name,
+          'localField': 'events.evId',
+          'foreignField': '_id',
+          'as': 'events',
+        }
+      },
+      { '$unwind': '$events' },
+      {
+        "$addFields": 
+          {
+              "events.statement": {
+                  $concat: ['$device_name',' ','$events.statement']
+              },
+          },
+      },
+      
+         { '$group': {
+        '_id': '$_id',
+        'device_name': { '$first': '$device_name' },
+        'events': { '$push': '$events' }
+      }}
+      ]);
+    //   query.exec((err, device) => {
+    //     return res.status(200).send(  device )
+    // })
+    return res.status(200).send( device )
+  } catch (error) {
+      // res.status(500).send(error)
+      return next(error)
+  }
+ 
+}

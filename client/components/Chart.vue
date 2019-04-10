@@ -4,7 +4,7 @@
                     <div _ngcontent-c8="" _nghost-c10="" ng-reflect-id="1">
                         <div _ngcontent-c10="" class="row ng-star-inserted">
                         <div _ngcontent-c10="" class="box-title">
-                            <h2 _ngcontent-c10="" title="Hall temperature"> {{dev.title}}</h2>
+                            <h2 _ngcontent-c10="" title="Hall temperature"> {{dev.device_name}}</h2>
                             <p _ngcontent-c10="" title="Show Today Live Statistics">Show Today Live Statistics</p>
                         </div>
                         </div>
@@ -155,7 +155,7 @@ export default {
         this.$mqtt.subscribe(this.dev.data_source, 'Hello MQTT from NUXT')
         const series = this.$children[0].chart.series[0];
       
-
+        // console.log(this.dev)
         // this.$mqtt.on('message', (topic, message,packet)  => {
         //     // message is Buffer
         //     console.log('Topic: ',topic)
@@ -232,7 +232,7 @@ export default {
         // this.$mqtt.end()
         // this.$forceUpdate();
         // this.client.end()
-         this.$mqtt.unsubscribe(this.dev.data_source)
+        this.$mqtt.unsubscribe(this.dev.data_source)
     },
 }
 </script>

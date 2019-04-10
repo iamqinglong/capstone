@@ -16,6 +16,11 @@ router.post('/authenticate', crtlUser.authenticate)
 router.get('/userProfile', jwtHelper.verifyJwtToken ,crtlUser.userProfile)
 router.post('/logout', crtlUser.logout)
 
+//User
+router.get('/getAllUsers', crtlUser.getAll)
+router.get('/getUserById/:id', crtlUser.getById)
+router.put('/updateUser/:id', crtlUser.update)
+router.post('/createUser', crtlUser.create)
 //Device
 router.post('/createDevice', crtlDevice.create)
 router.get('/getDevice/:id', crtlDevice.get)
@@ -43,11 +48,13 @@ router.post('/createEvent/:id', ctrlEvent.create)
 router.get('/getDeviceEvent/:id', ctrlEvent.getAll)
 router.post('/deleteEvent', ctrlEvent.delete)
 router.get('/getEvent/:id', ctrlEvent.get)
+router.get('/getEventByTopic/', ctrlEvent.getAllByTopic)
 router.post('/updateEvent/:id', ctrlEvent.update)
 
 //Notification
 router.post('/createNotification', ctrlNotification.create)
-router.get('/getNotification/:id', ctrlNotification.get)
+router.get('/getUserNotification/:id', ctrlNotification.get)
+router.get('/getNotification/:id', ctrlNotification.getNotif)
 //UserNotification
 router.post('/createUserNotification/:id', ctrlUserNotification.create)
 

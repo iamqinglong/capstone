@@ -4,9 +4,6 @@ const _ = require('lodash')
 
 module.exports.create = async (req,res,next) => {
     try {
-
-        // let devId = mongoose.Types.ObjectId(req.params.id);
-        // let notifId = req.body.notifId;
        
 
         await UserNotification.findOneAndUpdate({userId: mongoose.Types.ObjectId(req.params.id), notifId: req.body.notifId},

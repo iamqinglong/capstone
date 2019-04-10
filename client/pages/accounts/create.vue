@@ -15,7 +15,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="card-box">
-                                                <h4 class="m-t-0 header-title">Device general information</h4>
+                                                <h4 class="m-t-0 header-title">Account general information</h4>
                                                 <p class="text-muted m-b-30 font-13">
                                                     Here you can modify display name or other general information
                                                 </p>
@@ -23,23 +23,35 @@
                                                 <form>
                                                     <div class="form-row">
                                                         <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Device Name</label>
-                                                            <input v-model.trim="form.device_name" type="text" required="" class="form-control" id="" placeholder="Device Name">
-                                                            <small class="form-text text-danger" v-if="errors.device_name">{{errors.device_name}}</small>
+                                                            <label for="" class="col-form-label">First Name</label>
+                                                            <input v-model="firstName" type="text" required="" class="form-control" id="" placeholder="First Name">
+                                                            <small class="form-text text-danger" v-if="errors.firstName">{{errors.firstName}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Data Source</label>
-                                                            <input v-model.trim="form.data_source" type="text" required="" class="form-control" id="" placeholder="Data Source">
-                                                            <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
+                                                            <label for="" class="col-form-label">Last Name</label>
+                                                            <input v-model="lastName" type="text" required="" class="form-control" id="" placeholder="Last Name">
+                                                            <small class="form-text text-danger" v-if="errors.lastName">{{errors.lastName}}</small>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="" class="col-form-label">Location</label>
-                                                        <input v-model.trim="form.location" type="text" required="" class="form-control" id="" placeholder="Set device location">
-                                                        <small class="form-text text-danger" v-if="errors.location">{{errors.location}}</small>
+                                                        <label for="" class="col-form-label">Email</label>
+                                                        <input v-model="email" type="email" required="" class="form-control" id="" placeholder="Email">
+                                                        <small class="form-text text-danger" v-if="errors.email">{{errors.email}}</small>
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-6">
+                                                            <label for="" class="col-form-label">Password</label>
+                                                            <input v-model="password" type="password" required="" class="form-control" id="" placeholder="Password">
+                                                            <small class="form-text text-danger" v-if="errors.password">{{errors.Password}}</small>
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            <label for="" class="col-form-label">Confirm Password</label>
+                                                            <input v-model="confirm" type="password" required="" class="form-control" id="" placeholder="Confirm">
+                                                            <small class="form-text text-danger" v-if="errors.confirm">{{errors.confirm}}</small>
+                                                        </div>
                                                     </div>
                                                    
-                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Device</button>
+                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Account</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
                                                 </form>
                                             </div>
@@ -62,11 +74,12 @@ export default {
     middleware: 'auth',
     data() {
         return {
-            form : {
-                device_name: '',
-                data_source: '',
-                location: '',
-            }
+
+            firstName: '',
+            lastName:'',
+            email:'',
+            password:'',
+            confirm:'',
         }
     },
     async asyncData({store}) {
@@ -103,30 +116,42 @@ export default {
     methods: {
         async create () {
             try {
-                console.log(this.form)
-                let result = await this.$axios.post('/createDevice',{
-
-                    device_name: this.form.device_name,
-                    data_source: this.form.data_source,
-                    location: this.form.location
-
-                })
                 
-                this.$swal.fire({
-                        title: 'Created!',
-                        text: `${result.data.message}`,
-                        type: 'success',
-                        confirmButtonText: 'Ok'
-                    })
+                if(this.confirm === this.password)
+                {
+                    let result = await this.$axios.post('/createUser',{
 
-                this.$router.push('/devices');
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        email: this.email,
+                        password: this.password
+
+                    })
+                    
+                    this.$swal.fire({
+                            title: 'Created!',
+                            text: `${result.data.message}`,
+                            type: 'success',
+                            confirmButtonText: 'Ok'
+                        })
+
+                    this.$router.back();
+                }
+                else
+                {
+                    let data = {
+                        confirm : `Confirm Password didn't match`
+                    }
+                    this.$store.dispatch("validation/setErrors", data)
+                    // this.errors.confirm = `Confirm Password didn't match`
+                }
             } catch (error) {
                 console.log(error)
             }
         },
         async cancel (){
             try {
-                 this.$router.push('/devices');
+                 this.$router.push('/accounts');
             } catch (error) {
                 console.log(error)
             }

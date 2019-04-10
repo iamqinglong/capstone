@@ -210,8 +210,8 @@ import style_thirteen from '@/static/css/style_thirteen.css'
               },
             }   
         },
-    async asyncData ({ params, error, $axios }) {
-
+    async asyncData ({ params, error, $axios, store }) {
+      await store.dispatch("notification/setUserMessagesRec")
       
       let [device, technician, events] =  await Promise.all([ $axios.get(`/getDeviceTechnician/${params.id}`),
                                  $axios.get(`/getAllNotDeviceTechnician/${params.id}`),
@@ -242,13 +242,38 @@ import style_thirteen from '@/static/css/style_thirteen.css'
             // title:'Manage | ' + this.device.device_name
         }
     },
-    mounted(){
+    async mounted(){
       //  console.log(this.device.device.length)
        if(this.device.device.length != 0 ) this.tech = this.device.device[0].technicians
        if(this.events.length != 0) this.event = this.events[0].events
         this.avail = this.availTechnicians.technician
 
-  
+        
+        this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
     },
      methods: {
        async getData(){

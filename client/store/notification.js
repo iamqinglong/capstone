@@ -3,19 +3,47 @@
 export const state = () => ({
     notifications: [],
     messagesRec: [],
+    unread: 0,
     messagesSent : [],
     message: {
+        _id: '',
     	subject : '',
-    	message : '',
-    	sender : '',
+        message : '',
+        created_at : '',
+        updated_at : '',
     }
 })
 
 //mutators
 export const mutations = {
-  SET_MSG_REC (state, messages ){
-  		state.messagesRec = messages
+  SET_MSG_REC (state, messages , unread){
+          state.messagesRec = messages
+          
+  },
+
+  SET_UNREAD (state,unread) {
+    state.unread = unread
+  },
+
+  SET_MSG_VIEW (state, message ) {
+    state.message = message
+  },
+
+  CLEAR_MESSAGE (state) {
+    state.message = {
+        _id: '',
+    	subject : '',
+        message : '',
+        created_at : '',
+        updated_at : '',
+    }
+  },
+
+  NEW_MSG_NOTIFICATION (state, message){
+    state.messagesRec.unshift(message)
   }
+  
+
   
 }
 
@@ -30,14 +58,33 @@ export const getters =  {
 
 //actions
 export const actions = {
+    
      async setUserMessagesRec ({commit, rootState }) {
    		
-   		// let id = '5c8b2ee76700b710bce659e8'
-   		let id = rootState.auth.user._id
-   		// console.log(id)
-   		let data = await this.$axios.$get(`/getNotification/${id}`)
-   		// console.log(data.notification)
-   		commit('SET_MSG_REC', data.notification)
    		
-   }
+      if(rootState.auth.loggedIn){
+        let id = rootState.auth.user._id
+        let data = await this.$axios.$get(`/getUserNotification/${id}`)
+   		
+           commit('SET_MSG_REC', data.notification)
+           commit('SET_UNREAD', data.unread)
+      }
+   		
+   },
+   
+   async getNotificationById ({commit}, id) {
+       
+        let data = await this.$axios.$get(`/getNotification/${id}`)
+        // console.log(data.notification)
+   		commit('SET_MSG_VIEW', data.notification)
+   },
+
+   async clearMessage ({commit}) {
+       commit('CLEAR_MESSAGE')
+   },
+
+   async newMessageNotification ({commit}, message)
+   {
+     commit('NEW_MSG_NOTIFICATION', message)
+   },
 }

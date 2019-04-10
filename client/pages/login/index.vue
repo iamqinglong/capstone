@@ -75,6 +75,7 @@ export default {
             password: this.password,
           },
         });
+        this.$store.dispatch("notification/setUserMessagesRec")
         // console.log(res)
         // this.$router.push('/');
       } catch (e) {

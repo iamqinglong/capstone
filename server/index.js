@@ -2,7 +2,11 @@ require('./config/config');
 require('./models/db');
 require('./config/passportConfig')
 
+
 const express = require('express');
+// const RedisServer = require('redis-server');
+// const redis = require("redis")
+// const client = redis.createClient();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const http = require('http')
@@ -15,7 +19,7 @@ const web = http.createServer(app);
 const rtsIndex = require('./routes/index.router')
 const serialPort = require('serialport');
 const readLine = serialPort.parsers.Readline;
-// const session = require('express-session')
+const axios = require('axios');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -25,14 +29,8 @@ app.use(passport.session());
 app.use('/api',rtsIndex)
 const error = require('./error_handler/error.handler')
 app.use(error)
-// app.use(session()); // session middleware
-// app.use(require('flash')());
 
-// app.use(function (req, res) {
-//   // flash a message
-//   req.flash('info', 'hello!');
-//   next();
-// })
+
 
 var mqtt_port = process.env.MQTT_PORT || 1883
 // var port = process.env.HTTP_PORT || 8080
@@ -46,6 +44,14 @@ web.listen(process.env.PORT, () => {
 })
 websocket.createServer({server: web}, aedes.handle);
 
+// client.on('connect', () => {
+//     console.log('Connected')
+// })
+// client.on('error', function(error)
+// {
+//  console.log("Error While creating the Socket Connection");
+
+// });
 aedes.on('clientError', function (client, err) {
 console.log('client error', client.id, err.message, err.stack)
 })
@@ -88,6 +94,7 @@ app.get('/',(req,res)=>{
 })
 
 //SERIAL COMMUNICATION
+
 // const sensorPort = new serialPort('COM3', {
 //     baudRate: 9600,
 // });
@@ -95,25 +102,65 @@ app.get('/',(req,res)=>{
 // const parser = sensorPort.pipe(new readLine({ delimiter: '\r\n'}));
 // parser.on('open', onOpen);
 
-// parser.on('data', (data) => {
+// parser.on('data', async (data) => {
 
 //     console.log(data)
-
+//     // console.log(`${process.env.PORT}`)
+//     // console.log(`http://localhost:${process.env.PORT}/getEventByTopic/?topic=/temp2`)
 //    try{
-        
+//      //Get event by topic/ don't forget to change temp2 dynamically
+//     let events = await axios.get(`http://localhost:${process.env.PORT}/api/getEventByTopic/?topic=/temp2`)
 //     aedes.publish({
 //         qos: 0,
 //         topic: '/temp1',
 //         payload: data,
 //         retain: false
 //       });
-//     let datum = parseInt(data)+2
-//     aedes.publish({
-//         qos: 0,
-//         topic: '/temp2',
-//         payload: datum.toString(),
-//         retain: false
-//     });
+//     events.data[0].events.forEach(async (element) => {
+//             if( element.statement === 'goes more than' )
+//                {
+    //             if(data > element.value )
+    //             {
+    //                 //console.log(element.value)
+    //                 let res = await axios.post(`http://localhost:${process.env.PORT}/api/createNotification`,{
+    //                     subject : `${events.data[0].device_name} is high`,
+    //                     message: `${events.data[0].device_name} is ${data} which surpass the maximum threshold ${element.value}`
+    //                 })
+                
+    //                 aedes.publish({
+    //                     qos: 0,
+    //                     topic: '/notification',
+    //                     payload: JSON.stringify(res.data.result),
+    //                     retain: false
+    //                 });
+    //             }
+//                }
+//             else if( element.statement === 'goes less than' )
+//              {
+    //             if(data < element.value )
+    //             {
+    //                 //console.log(element.value)
+    //                 let res = await axios.post(`http://localhost:${process.env.PORT}/api/createNotification`,{
+    //                     subject : `${events.data[0].device_name} is low`,
+    //                     message: `${events.data[0].device_name} is ${data} which lower than the minimum threshold ${element.value}`
+    //                 })
+                
+    //                 aedes.publish({
+    //                     qos: 0,
+    //                     topic: '/notification',
+    //                     payload: JSON.stringify(res.data.result),
+    //                     retain: false
+    //                 });
+    //             }                  
+//              }
+//       });
+//     // let datum = parseInt(data)+2
+//     // aedes.publish({
+//     //     qos: 0,
+//     //     topic: '/temp2',
+//     //     payload: datum.toString(),
+//     //     retain: false
+//     // });
 //     // console.log('test')
 
 //    }catch(error){
@@ -125,4 +172,9 @@ app.get('/',(req,res)=>{
 // });
 // function onOpen() {
 //     console.log('Arduino connected!');
+// }
+
+// function random()
+// {
+    
 // }

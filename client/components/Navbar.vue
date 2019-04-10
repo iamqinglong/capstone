@@ -1,6 +1,8 @@
 <template>
   <div>
+      
         <header id="topnav">
+            
             <div class="topbar-main">
                 <div class="container-fluid">
 
@@ -31,39 +33,33 @@
                                 </a>
                                 <!-- End mobile menu toggle-->
                             </li>
-                            <li class="list-inline-item dropdown notification-list">
+                            <li v-if="authenticated" class="list-inline-item dropdown notification-list">
                                 <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                                     <i class="mdi mdi-bell noti-icon"></i>
-                                    <span class="badge badge-pink noti-icon-badge">4</span>
+                                    <span class="badge badge-pink noti-icon-badge">{{notification.unread}}</span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg" aria-labelledby="Preview">
                                     <!-- item-->
                                     <div class="dropdown-item noti-title">
-                                        <h5 class="font-16"><span class="badge badge-danger float-right">5</span>Notification</h5>
+                                        <h5 class="font-16"><span class="badge badge-danger float-right">{{notification.unread}}</span>Notification</h5>
                                     </div>
 
                                     <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                        <div class="notify-icon bg-success"><i class="mdi mdi-comment-account"></i></div>
-                                        <p class="notify-details">Robert S. Taylor commented on Admin<small class="text-muted">1 min ago</small></p>
-                                    </a>
-
-                                    <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                        <div class="notify-icon bg-info"><i class="mdi mdi-account"></i></div>
-                                        <p class="notify-details">New user registered.<small class="text-muted">1 min ago</small></p>
-                                    </a>
-
-                                    <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                        <div class="notify-icon bg-danger"><i class="mdi mdi-airplane"></i></div>
-                                        <p class="notify-details">Carlos Crouch liked <b>Admin</b><small class="text-muted">1 min ago</small></p>
-                                    </a>
+                                    
+                                    <nuxt-link  v-for="message in notification.messagesRec.slice(0,5)" 
+                                    :key="message._id" 
+                                    @click.native="createUserNotification(message._id)"  
+                                    :to="'/notification/' + message._id" 
+                                    v-bind:class="[message.users.length == 0 ? 'unread':'read']"
+                                    class="dropdown-item notify-item">
+                                    <div class="notify-icon bg-success"><i class="mdi mdi-comment-account"></i></div>
+                                    <p class="notify-details">{{message.subject}}<small class="text-muted">{{message.created_at  | moment("from", "now", true)}} ago</small></p>
+                                    </nuxt-link>
 
                                     <!-- All-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item notify-all">
+                                    <nuxt-link to="/notification"  class="dropdown-item notify-item notify-all">
                                         View All
-                                    </a>
+                                    </nuxt-link>
 
                                 </div>
                             </li>
@@ -123,9 +119,13 @@
                                 <li v-if="authenticated" class="has-submenu">
                                 <nuxt-link to="/technicians">Technician</nuxt-link>
                              </li>
-                             </li>
+                             <li>
                                 <li v-if="authenticated" class="has-submenu">
                                 <nuxt-link to="/notification">Notifications</nuxt-link>
+                             </li>
+                             <li>
+                                <li v-if="authenticated" class="has-submenu">
+                                <nuxt-link to="/accounts">Accounts</nuxt-link>
                              </li>
                              <li v-if="!authenticated" class="has-submenu">
                              <!-- <li  v-if="!isAuthenticated" class="has-submenu">     -->
@@ -144,6 +144,7 @@
                 </div> <!-- end container -->
             </div> <!-- end navbar-custom -->
         </header>
+        
     </div>
 </template>
 
@@ -155,21 +156,89 @@ export default {
     // ...mapGetters({
     //     loggedIn : "auth/authenticated"
     // }),
+    // ...mapState({
+        // notification : state => state.notification
+    //   })
   },
+  async created() {
+    // this.$store.dispatch("notification/setUserMessagesRec")
+    // if(this.$loggedIn)
+    // {
+    //     this.$store.dispatch("notification/setUserMessagesRec")
+    //     this.$nextTick(callback)
+    // }
+ },
+ async asyncData({store}) {
+      await store.dispatch("notification/setUserMessagesRec")
+ },
+ async mounted() {
+    
+    // if(this.$auth.loggedIn)
+    // {
+        this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                this.$store.dispatch("notification/newMessageNotification", msg[0])
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
+    // }
+
+ },
   methods: {
     async logout() {
       await this.$auth.logout();
     },
+    async createUserNotification (id) {
+  
+    try {
+        await this.$axios.post(`/createUserNotification/${this.user._id}`, {
+          notifId: id
+      })
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
   },
+  async destroyed() {
+      this.$mqtt.unsubscribe(this.dev.data_source)
+  },
+  
 };
 </script>
 
-<style scoped>
+<style >
 .dropdown-menu {
 
     background-color: #3d4853;
     border: 1px solid rgba(0, 0, 0, 0.15);
 
 }
+
+.unread {
+    font-weight: 800;
+    color: #ffffff;
+}
+
 </style>
 

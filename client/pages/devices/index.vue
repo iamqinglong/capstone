@@ -92,9 +92,9 @@ export default {
   computed: {
     // ...mapGetters(['loggedInUser']),
   },
-   asyncData ({ params, error , $axios}) {
-
-        return $axios.get('/getAllDevice')
+   async asyncData ({ params, error , $axios, store}) {
+       await store.dispatch("notification/setUserMessagesRec")
+        return await $axios.get('/getAllDevice')
 
     .then((res) => {
         return { devices : res.data}
@@ -110,6 +110,34 @@ export default {
                             })
 
     })
+    },
+    async mounted() {
+
+        this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
     },
     methods: {
          async deleteDevice (id){

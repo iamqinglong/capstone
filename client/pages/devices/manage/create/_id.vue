@@ -78,7 +78,7 @@ export default {
             selectedCondition: 'if',
             optionsCondition: [
             { value: 'if', text: 'If' },
-            { value: 'if not', text: 'If not' },
+            // { value: 'if not', text: 'If not' },
             ],
             selectedActions: 'Send a text message',
             optionsActions: [
@@ -86,7 +86,8 @@ export default {
             ],
         }
     },
-    async asyncData({params, error, $axios}) {
+    async asyncData({params, error, $axios, store}) {
+        await store.dispatch("notification/setUserMessagesRec")
         let res = await $axios.get(`/getDevice/${params.id}`)
         // console.log(params.id)
         return {
@@ -99,8 +100,34 @@ export default {
             ],
         }
     },
-    mounted() {
+    async mounted() {
         // console.log(optionsStatement)
+
+        this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
     },
     methods: {
         async create () {

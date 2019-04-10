@@ -55,6 +55,12 @@ export default {
     'plugins/axios.js',
     'plugins/mixins/validation.js',
     // 'plugins/vue-js-modal.js',
+    'plugins/mixins/notification.js',
+    'plugins/moment.js',
+    'plugins/vue-notification.js',
+    'plugins/vuetify.js',
+    // 'plugins/izitoast.js',
+    { src: '~/plugins/izitoast.js', ssr: false , mode: 'client'}
   ],
 
   /*
@@ -64,13 +70,23 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth',
     'bootstrap-vue/nuxt',
+    '@nuxtjs/toast',
     [
       'nuxt-sweetalert2',
       {
         confirmButtonColor: '#007bff'
       }
     ],
+    'nuxt-izitoast',
   ],
+  izitoast: {
+    position: 'bottomRight',
+    transitionIn: 'bounceInLeft',
+    transitionOut: 'fadeOutRight',
+  },
+  toast: {
+    position: 'bottom-left'
+  },
   /*
   ** Axios module configuration
   */

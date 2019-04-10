@@ -92,8 +92,9 @@ export default {
             ],
         }
     },
-    async asyncData({params, error, $axios}) {
+    async asyncData({params, error, $axios, store }) {
         // let res = await $axios.get(`/getEvent/${params.id}`)
+        await store.dispatch("notification/setUserMessagesRec")
         const [evId, devId ] = params.id.split('_')
 
         let [event, device] =  await Promise.all([ 
@@ -114,7 +115,7 @@ export default {
             title:'Edit | ' + this.device.device_name
         }
     },
-    mounted() {
+    async mounted() {
         // console.log(this.event.result)
         this.value = this.event.result.value
         this.selectedCondition = this.event.result.condition
@@ -123,6 +124,33 @@ export default {
                 { value: 'goes more than', text: `${this.device.device_name} goes more than` },
                 { value: 'goes less than', text: `${this.device.device_name} goes less than` },
                 { value: 'idle for', text: `${this.device.device_name} is idle for` },)
+
+
+        this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
 
         
     },

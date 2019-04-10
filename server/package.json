@@ -11,6 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "aedes": "^0.37.0",
+    "aedes-persistence-redis": "^6.0.0",
+    "axios": "^0.18.0",
     "bcrypt": "^3.0.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -26,6 +28,8 @@
     "mongoose-validatorjs": "^0.7.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "redis": "^2.8.0",
+    "redis-server": "^1.2.2",
     "serialport": "^7.1.4",
     "validate.io-alphanumeric": "^1.0.0",
     "websocket-stream": "^5.1.2"

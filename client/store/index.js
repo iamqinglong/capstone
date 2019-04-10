@@ -16,3 +16,13 @@
 //     return state.user
 //   }
 // }
+
+// export const actions = {
+//     async nuxtServerInit ({ dispatch, rootState }) {
+//         if(rootState.auth.loggedIn)
+//         {
+//             await dispatch ('notification/setUserMessagesRec',{root:true})
+//         }
+        
+//     },
+// }

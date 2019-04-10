@@ -78,7 +78,39 @@ export default {
             }
         }
     },
-    //testing cloning git branch
+     async asyncData({store}) {
+      await store.dispatch("notification/setUserMessagesRec")
+    },
+    async mounted() {
+      this.data = this.technician
+      
+      this.$mqtt = await this.$mqtt
+        this.$mqtt.subscribe('/notification')
+        this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+            if(topic === '/notification')
+            {
+                let msg = JSON.parse( message.toString('utf8') )
+                // this.$store.dispatch("notification/newMessageNotification", msg[0])
+                await this.$store.dispatch("notification/setUserMessagesRec")
+
+                this.$izitoast.warning({
+                                    title: 'Caution',
+                                    message: `${msg[0].subject}`,
+                                    
+                                        closeOnClick: true,
+                                        onClosing: function(instance, toast, closedBy) {
+                                        console.info("Closing | closedBy: " + closedBy);
+                                        },
+                                        onClosed: function(instance, toast, closedBy) {
+                                        console.info("Closed | closedBy: " + closedBy);
+                                        }
+                                    })
+
+            }
+            
+        })
+    },
     methods: {
         async create () {
             try {

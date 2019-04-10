@@ -15,13 +15,13 @@
                                     <div class="col-lg-12">
                                     <div class="card-box">
                                         <div>
-                                          <h4 class="m-t-0 header-title">Technicians</h4>
+                                          <h4 class="m-t-0 header-title">Accounts</h4>
                                           <p class="text-muted font-14 m-b-20">
-                                             List of Technicians
+                                             List of Accounts
                                           </p>
                                           <div >
-                                            <nuxt-link to="/technicians/create">
-                                              <button type="button" class="btn btn-primary waves-effect waves-light">New Technician</button>
+                                            <nuxt-link to="/accounts/create">
+                                              <button type="button" class="btn btn-primary waves-effect waves-light">New Account</button>
                                             </nuxt-link> 
                                           </div>
                                         </div>
@@ -31,10 +31,10 @@
                                             
                                             <span slot="actions" slot-scope="{row}">
                                               
-                                                <!-- <button v-on:click="edit(row.id)">Edit</button> -->
-                                                <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
-                                                <a  @click.prevent="deleteTech(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
-                                                <!-- <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link> -->
+                                                
+                                                <nuxt-link :to="'/accounts/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
+                                                <a  @click.prevent="deleteAcct(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
+                                                
                                             </span>
 
                                            </v-client-table>
@@ -64,13 +64,7 @@
   	
   	</div>
 </template>
-
 <script>
-import Devices from '@/components/Devices.vue'
-import style_ten from '@/static/css/style_ten.css'
-import style_thirteen from '@/static/css/style_thirteen.css'
-
-// import axios from 'axios'
 import Vue from 'vue'
 import {ClientTable, Event} from 'vue-tables-2';
 Vue.use(ClientTable);
@@ -78,31 +72,31 @@ Vue.use(ClientTable);
 export default {
   middleware: 'auth',
   components:{
-      Devices
+    //   Devices
   },
   computed: {
   },
   data(){
             return {
                   columns: [
-                  // '_id',
-                  'first_name',
-                  'last_name',
-                  'phone_number',
+                //   '_id',
+                  'firstName',
+                  'lastName',
+                  'email',
                   'actions'
                   ],
                 data: [],
                 options: {
                   headings: {
                     // _id: {columnsDisplay: true},
-                    first_name: 'First Name',
-                    last_name: 'Last Name',
-                    phone_number: 'Phone Number',
+                    firstName: 'First Name',
+                    lastName: 'Last Name',
+                    email: 'Email',
                     actions: 'Actions'
                   },
                   sortable: [
                     // '_id', 
-                    'first_name', 'last_name'
+                    'firstName', 'lastName'
                     ],
                   texts: {
                     filterPlaceholder: 'filter'
@@ -121,10 +115,10 @@ export default {
         },
     async asyncData ({ params, error, $axios, store }) {
         await store.dispatch("notification/setUserMessagesRec")
-        return await $axios.get('/getAllTechnician')
+        return await $axios.get('/getAllUsers')
 
     .then((res) => {
-        return { technician : res.data}
+        return { users : res.data}
 
     })
     .catch((e) => {
@@ -134,9 +128,8 @@ export default {
     })
     },
     async mounted() {
-      this.data = this.technician
-      
-      this.$mqtt = await this.$mqtt
+        this.data = this.users
+        this.$mqtt = await this.$mqtt
         this.$mqtt.subscribe('/notification')
         this.$mqtt.on('message', async (topic, message,packet)  => {
             
@@ -220,7 +213,6 @@ export default {
     
 };
 </script>
-
 <style type="scss">
 #app {
   width: 95%;
