@@ -1,8 +1,7 @@
 <template>
-  <div>
-      
+<!-- Navigation Bar-->
+    <no-ssr>
         <header id="topnav">
-            
             <div class="topbar-main">
                 <div class="container-fluid">
 
@@ -11,8 +10,13 @@
                         <!-- Text Logo -->
                         <a href="index.html" class="logo">
                             <span class="logo-small"><i class="mdi mdi-radar"></i></span>
-                            <span class="logo-large"><i class="mdi mdi-radar"></i> Capstone Project</span>
+                            <span class="logo-large"><i class="mdi mdi-radar"></i> Water Quality Monitoring System</span>
                         </a>
+                        <!-- Image Logo -->
+                        <!--<a href="index.html" class="logo">-->
+                            <!--<img src="assets/images/logo_dark.png" alt="" height="24" class="logo-lg">-->
+                            <!--<img src="assets/images/logo_sm.png" alt="" height="24" class="logo-sm">-->
+                        <!--</a>-->
 
                     </div>
                     <!-- End Logo container-->
@@ -33,18 +37,18 @@
                                 </a>
                                 <!-- End mobile menu toggle-->
                             </li>
-                            <li v-if="authenticated" class="list-inline-item dropdown notification-list">
+                            <li v-if="status" class="list-inline-item dropdown notification-list">
                                 <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                                     <i class="mdi mdi-bell noti-icon"></i>
                                     <span class="badge badge-pink noti-icon-badge">{{notification.unread}}</span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg" aria-labelledby="Preview">
-                                    <!-- item-->
+                                  
                                     <div class="dropdown-item noti-title">
                                         <h5 class="font-16"><span class="badge badge-danger float-right">{{notification.unread}}</span>Notification</h5>
                                     </div>
 
-                                    <!-- item-->
+                            
                                     
                                     <nuxt-link  v-for="message in notification.messagesRec.slice(0,5)" 
                                     :key="message._id" 
@@ -56,42 +60,44 @@
                                     <p class="notify-details">{{message.subject}}<small class="text-muted">{{message.created_at  | moment("from", "now", true)}} ago</small></p>
                                     </nuxt-link>
 
-                                    <!-- All-->
                                     <nuxt-link to="/notification"  class="dropdown-item notify-item notify-all">
                                         View All
                                     </nuxt-link>
-
-                                </div>
+                             </div>
                             </li>
                             <li v-if="authenticated" class="list-inline-item dropdown notification-list">
-                            <!-- <li v-if="isAuthenticated" class="list-inline-item dropdown notification-list"> -->
-                                <a class="nav-link dropdown-toggle waves-effect nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle waves-effect nav-user" data-toggle="dropdown" href="#" role="button"
+                                   aria-haspopup="false" aria-expanded="false">
                                     <img src="/images/users/avatar-1.jpg" alt="user" class="rounded-circle">
                                 </a>
-                                <div  class="dropdown-menu dropdown-menu-right profile-dropdown " aria-labelledby="Preview">
+                                <div class="dropdown-menu dropdown-menu-right profile-dropdown " aria-labelledby="Preview">
                                     <!-- item-->
                                     <div class="dropdown-item noti-title">
-                                        <h5 class="text-overflow"><small class="text-white">Welcome ! {{ user.lastName }}</small> </h5>
+                                        <h5 class="text-overflow"><small class="text-white">Welcome, {{ user.lastName }}</small> </h5>
                                     </div>
 
                                     <!-- item-->
-                                     <nuxt-link class="dropdown-item notify-item" to="/profile">
-                                      <i class="mdi mdi-account"></i> <span>Profile</span>
-                                     </nuxt-link>
-                                  
+                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                        <i class="mdi mdi-account"></i> <span>Profile</span>
+                                    </a>
+
                                     <!-- item-->
+                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                        <i class="mdi mdi-settings"></i> <span>Settings</span>
+                                    </a>
+
+                                    <!-- item-->
+                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                        <i class="mdi mdi-lock-open"></i> <span>Lock Screen</span>
+                                    </a>
+
                                     <a href="" @click.prevent="logout" class="dropdown-item notify-item">
                                         <i class="mdi mdi-logout"></i> <span>Logout</span>
                                     </a>
                                 </div>
-                                <!-- <template v-else>
-                                  <nuxt-link class="navbar-item" to="/register">Register</nuxt-link>
-                                  <nuxt-link class="navbar-item" to="/login">Log In</nuxt-link>
-                                </template> -->
                             </li>
 
                         </ul>
-                        
                     </div>
                     <!-- end menu-extras -->
 
@@ -104,48 +110,55 @@
             <div class="navbar-custom">
                 <div class="container-fluid">
                     <div id="navigation">
-                        <!-- Navigation Menu-->
-                        <ul class="navigation-menu">
+                        
+                        <ul v-if="status" class="navigation-menu">
 
-                            <li class="has-submenu">
-                                <!-- <a href=""><i class="ti-home"></i>Dashboard</a> -->
+                            <li class="nav-item">
                                 <nuxt-link to="/">Dashboard</nuxt-link>
                             </li>
-                            <li v-if="authenticated" class="has-submenu">
-                             <!-- <li v-if="isAuthenticated" class="has-submenu">     -->
-                                <!-- <a href="/devices"><i class="ti-home"></i>Devices</a> -->
+
+                            <li class="nav-item">
                                 <nuxt-link to="/devices">Devices</nuxt-link>
                              </li>
-                                <li v-if="authenticated" class="has-submenu">
+
+                             <li class="nav-item">
                                 <nuxt-link to="/technicians">Technician</nuxt-link>
                              </li>
-                             <li>
-                                <li v-if="authenticated" class="has-submenu">
+                          
+                             <li class="nav-item">
                                 <nuxt-link to="/notification">Notifications</nuxt-link>
                              </li>
-                             <li>
-                                <li v-if="authenticated" class="has-submenu">
+                            
+                            <li class="nav-item">
                                 <nuxt-link to="/accounts">Accounts</nuxt-link>
+                            </li>
+
+                            <li class="nav-item">
+                                <nuxt-link to="/reports">Reports</nuxt-link>
                              </li>
-                             <li v-if="!authenticated" class="has-submenu">
-                             <!-- <li  v-if="!isAuthenticated" class="has-submenu">     -->
-                                <!-- <a href="/devices"><i class="ti-home"></i>Devices</a> -->
-                                <nuxt-link to="/register">Register</nuxt-link>
+                              <li class="nav-item">
+                                <nuxt-link to="/modem">Modem Setting</nuxt-link>
                              </li>
-                             <li v-if="!authenticated" class="has-submenu">
-                             <!-- <li v-if="!isAuthenticated" class="has-submenu">     -->
-                                <!-- <a href="/devices"><i class="ti-home"></i>Devices</a> -->
-                                <nuxt-link to="/login">Login</nuxt-link>
-                             </li>
+                             
                         </ul>
-                        
+                        <ul v-else class="navigation-menu">
+
+                            <li class="has-submenu">
+                                <nuxt-link to="/">Dashboard</nuxt-link>
+                            </li>
+                            
+                            <li  class="has-submenu">
+                                <nuxt-link to="/login">Login</nuxt-link>
+                            </li>
+                        </ul>
                         <!-- End navigation menu -->
                     </div> <!-- end #navigation -->
                 </div> <!-- end container -->
             </div> <!-- end navbar-custom -->
         </header>
-        
-    </div>
+        <!-- End Navigation Bar-->
+        </no-ssr>
+
 </template>
 
 <script>
@@ -159,6 +172,10 @@ export default {
     // ...mapState({
         // notification : state => state.notification
     //   })
+    status()
+    {
+      return  this.$store.state.auth.loggedIn
+    }
   },
   async created() {
     // this.$store.dispatch("notification/setUserMessagesRec")
@@ -172,7 +189,8 @@ export default {
       await store.dispatch("notification/setUserMessagesRec")
  },
  async mounted() {
-    
+     
+    // console.log(this.authenticated)
     // if(this.$auth.loggedIn)
     // {
         this.$mqtt = await this.$mqtt
@@ -182,6 +200,7 @@ export default {
             if(topic === '/notification')
             {
                 let msg = JSON.parse( message.toString('utf8') )
+                console.log(msg)
                 this.$store.dispatch("notification/newMessageNotification", msg[0])
                 await this.$store.dispatch("notification/setUserMessagesRec")
 
@@ -211,7 +230,7 @@ export default {
     async createUserNotification (id) {
   
     try {
-        await this.$axios.post(`/createUserNotification/${this.user._id}`, {
+        await this.$axios.post(`/api/createUserNotification/${this.user._id}`, {
           notifId: id
       })
 

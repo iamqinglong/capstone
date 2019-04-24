@@ -20,7 +20,7 @@
                                                     Here you can modify display name or other general information
                                                 </p>
 
-                                                <form>
+                                                <form @submit.prevent="update">
                                                     <div class="form-row">
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">First Name</label>
@@ -51,7 +51,7 @@
                                                         </div>
                                                     </div>
                                                    
-                                                    <button @click.prevent="update" type="submit" class="btn btn-primary">Update Account</button>
+                                                    <button  type="submit" class="btn btn-primary">Update Account</button>
                                                     <button @click.prevent="deleteAcct" type="submit" class="btn btn-danger">Delete Account</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
                                                 </form>
@@ -81,7 +81,7 @@ export default {
     async asyncData({ store, params, $axios}) {
         try {
             await store.dispatch("notification/setUserMessagesRec")
-            let result = await $axios.get(`/getUserById/${params.id}`)
+            let result = await $axios.get(`/api/getUserById/${params.id}`)
             return {
                     id: result.data.user._id,
                     account :{ 
@@ -105,32 +105,32 @@ export default {
     },
     async mounted() {
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                // this.$store.dispatch("notification/newMessageNotification", msg[0])
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         // this.$store.dispatch("notification/newMessageNotification", msg[0])
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
 
     },
     methods: {
@@ -152,7 +152,7 @@ export default {
                 try {
                     if(this.confirm === this.password)
                     {
-                        let result = await this.$axios.put(`/updateUser/${this.id}`, {
+                        let result = await this.$axios.put(`/api/updateUser/${this.id}`, {
 
                             firstName: this.account.firstName,
                             lastName: this.account.lastName,
@@ -194,7 +194,56 @@ export default {
                 }
            }
 
-        }
+        },
+        async deleteAcct (){
+            try {
+               
+                 const {value: result}  = await this.$swal.fire({
+
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+
+                    })
+                    if (result) {
+                
+                        let res = await this.$axios.delete(`/api/deleteUser/${this.id}`)
+                        if(!res.data.status){
+
+                            this.$swal.fire({
+                                title: 'Error!',
+                                text: `${res.data.message}`,
+                                type: 'error',
+                                confirmButtonText: 'Ok'
+                            })
+
+                        }
+                        else{
+                        
+                            this.$swal.fire({
+                                title: 'Deleted!',
+                                text: `${res.data.message}`,
+                                type: 'success',
+                            })
+                            this.$router.push('/accounts');
+                        }
+
+                    }
+               
+
+            } catch (error) {
+                console.log(error)
+            }
+           
+        },
+        async cancel (){
+        
+            this.$router.back(); 
+        },
     },
 }
 </script>

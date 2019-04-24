@@ -24,7 +24,7 @@
             </div> <!-- end container -->
       </div>
       <!-- Footer -->
-      <footer class="footer">
+      <!-- <footer class="footer">
           <div class="container">
               <div class="row">
                   <div class="col-12 text-center">
@@ -32,7 +32,7 @@
                   </div>
               </div>
           </div>
-      </footer>
+      </footer> -->
       <!-- End Footer -->
   	
   	</div>
@@ -64,7 +64,7 @@ export default {
     },
     async asyncData ({ params, error, $axios, store }) {
         await store.dispatch("notification/setUserMessagesRec")
-        return $axios.get('/getAllDevice')
+        return $axios.get('/api/getAllDevice')
 
         .then((res) => {
             // console.log(res.data)
@@ -78,33 +78,38 @@ export default {
         })
     },
     async mounted() {
-
+        // console.log(this.devices)
+        this.$router.push('/')
         this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt.subscribe('/notification')
+        // await this.$store.dispatch("notification/setUserMessagesRec")
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
 
+    },
+    async destroyed() {
+        //  this.$mqtt.unsubscribe('/notification')
     },
 }
 </script>

@@ -64,7 +64,7 @@ export const actions = {
    		
       if(rootState.auth.loggedIn){
         let id = rootState.auth.user._id
-        let data = await this.$axios.$get(`/getUserNotification/${id}`)
+        let data = await this.$axios.$get(`/api/getUserNotification/${id}`)
    		
            commit('SET_MSG_REC', data.notification)
            commit('SET_UNREAD', data.unread)
@@ -74,7 +74,7 @@ export const actions = {
    
    async getNotificationById ({commit}, id) {
        
-        let data = await this.$axios.$get(`/getNotification/${id}`)
+        let data = await this.$axios.$get(`/api/getNotification/${id}`)
         // console.log(data.notification)
    		commit('SET_MSG_VIEW', data.notification)
    },

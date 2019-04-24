@@ -115,7 +115,7 @@ export default {
         },
     async asyncData ({ params, error, $axios, store }) {
         await store.dispatch("notification/setUserMessagesRec")
-        return await $axios.get('/getAllUsers')
+        return await $axios.get('/api/getAllUsers')
 
     .then((res) => {
         return { users : res.data}
@@ -129,86 +129,86 @@ export default {
     },
     async mounted() {
         this.data = this.users
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                // this.$store.dispatch("notification/newMessageNotification", msg[0])
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         // this.$store.dispatch("notification/newMessageNotification", msg[0])
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
     methods: {
-         async deleteTech (id){
-            try {
-               
-              
-                 const {value: result}  = await this.$swal.fire({
-
-                            title: 'Are you sure?',
-                            text: "You won't be able to revert this!",
-                            type: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-
-                    })
-                    if (result) {
-                
-                        let res = await this.$axios.delete(`/deleteTech/${id}`)
-                        if(!res.data.status){
-
-                            this.$swal.fire({
-                                title: 'Error!',
-                                text: `${res.data.message}`,
-                                type: 'error',
-                                confirmButtonText: 'Ok'
-                            })
-
-                        }
-                        else{
-                            this.getData();
-                            this.$swal.fire({
-                                title: 'Deleted!',
-                                text: `${res.data.message}`,
-                                type: 'success',
-                            })
-                            this.$router.push('/technicians');
-                            // console.log(result)
-                        }
-
-                        
-                    }
-                
-            } catch (error) {
-                console.log(error)
-            }
-           
-        },
         
         async getData() {
-            let res = await this.$axios.get('/getAllTechnician');
+            let res = await this.$axios.get('/api/getAllUsers');
             this.data = res.data;
-        }
+        },
+        
+        async deleteAcct (id){
+          try {
+              
+                const {value: result}  = await this.$swal.fire({
+
+                          title: 'Are you sure?',
+                          text: "You won't be able to revert this!",
+                          type: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#3085d6',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: 'Yes, delete it!'
+
+                  })
+                  if (result) {
+              
+                      let res = await this.$axios.delete(`/api/deleteUser/${id}`)
+                      if(!res.data.status){
+
+                          this.$swal.fire({
+                              title: 'Error!',
+                              text: `${res.data.message}`,
+                              type: 'error',
+                              confirmButtonText: 'Ok'
+                          })
+
+                      }
+                      else{
+                      
+                          this.$swal.fire({
+                              title: 'Deleted!',
+                              text: `${res.data.message}`,
+                              type: 'success',
+                          })
+                          this.getData()
+                          this.$router.push('/accounts');
+                      }
+
+                  }
+              
+
+          } catch (error) {
+              console.log(error)
+          }
+        
+        },
     },
     
 };

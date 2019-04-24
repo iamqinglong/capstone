@@ -20,7 +20,7 @@
                                                     Here you can modify/set your action or other general information
                                                 </p>
 
-                                                <form>
+                                                <form @submit.prevent="create">
                                                     <div class="form-row">
                                                         <div class="form-group col-md-3">
                                                             <label for="" class="col-form-label">Condition</label>
@@ -40,8 +40,8 @@
                                                         </div>
                                                     </div>
                                                     
-                                            
-                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Event</button>
+                                                    <button type="submit" class="btn btn-primary">Create Event</button>
+                                                    <!-- <button @click.prevent="create" type="submit" class="btn btn-primary">Create Event</button> -->
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
                                                 </form>
                                             </div>
@@ -54,17 +54,7 @@
                     <!-- end page title end breadcrumb -->
                 </div> <!-- end container -->
         </div>
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 text-center">
-                        2016 - 2018 © Minton - Coderthemes.com
-                    </div>
-                </div>
-            </div>
-        </footer>
-        <!-- End Footer -->
+        
     </div>
 </template>
 
@@ -88,7 +78,7 @@ export default {
     },
     async asyncData({params, error, $axios, store}) {
         await store.dispatch("notification/setUserMessagesRec")
-        let res = await $axios.get(`/getDevice/${params.id}`)
+        let res = await $axios.get(`/api/getDevice/${params.id}`)
         // console.log(params.id)
         return {
             id: params.id,
@@ -96,44 +86,44 @@ export default {
             optionsStatement: [
             { value: 'goes more than', text: `${res.data.device[0].device_name} goes more than` },
             { value: 'goes less than', text: `${res.data.device[0].device_name} goes less than` },
-            { value: 'idle for', text: `${res.data.device[0].device_name} is idle for` },
+            // { value: 'idle for', text: `${res.data.device[0].device_name} is idle for` },
             ],
         }
     },
     async mounted() {
         // console.log(optionsStatement)
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
     methods: {
         async create () {
             try {
                
-                let result = await this.$axios.post(`/createEvent/${this.id}`,{
+                let result = await this.$axios.post(`/api/createEvent/${this.id}`,{
 
                     condition: this.selectedCondition,
                     statement: this.selectedStatement,

@@ -1,8 +1,11 @@
 import pkg from './package'
-
+const ip = require('ip')
 export default {
   mode: 'universal',
-
+  server: {
+      port: 8080, // default: 3000
+      host: ip.address(), // default: localhost
+    },
   /*
   ** Headers of the page
   */
@@ -16,7 +19,7 @@ export default {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       // { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css'},
-      { rel: 'stylesheet', href: '/css/bootstrap.min.css' },
+      // { rel: 'stylesheet', href: '/css/bootstrap.min.css' },
       { rel: 'stylesheet', href: '/css/icons.css' },
       { rel: 'stylesheet', href: '/css/style.css' },
 
@@ -49,7 +52,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    'plugins/mqtt.js',
+    { src: 'plugins/mqtt.js',mode: 'client'},
     // 'plugins/highcharts.js'
     'plugins/mixins/user.js',
     'plugins/axios.js',
@@ -60,7 +63,8 @@ export default {
     'plugins/vue-notification.js',
     'plugins/vuetify.js',
     // 'plugins/izitoast.js',
-    { src: '~/plugins/izitoast.js', ssr: false , mode: 'client'}
+    { src: '~/plugins/izitoast.js', ssr: false , mode: 'client'},
+    { src: 'plugins/vue-highcharts.js', ssr: false, mode: 'client' }
   ],
 
   /*
@@ -77,7 +81,9 @@ export default {
         confirmButtonColor: '#007bff'
       }
     ],
+    // ['nuxt-mqtt-module', { uri: `ws://${ip.address()}:8000` }],
     'nuxt-izitoast',
+    
   ],
   izitoast: {
     position: 'bottomRight',
@@ -92,7 +98,8 @@ export default {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
-     baseURL: 'http://127.0.0.1:8000/api',
+    //  baseURL: 'http://127.0.0.1:8000/api',
+    baseURL: `http://${ip.address()}:8000`,
      
   },
   auth: {
@@ -100,9 +107,9 @@ export default {
     strategies: {
       local: {
         endpoints: {
-          login: { url: '/authenticate', method: 'post', propertyName: 'token' },
-          user: { url: '/userProfile', method: 'get', propertyName: 'user' },
-          logout: {url: '/logout', method: 'post'},
+          login: { url: '/api/authenticate', method: 'post', propertyName: 'token' },
+          user: { url: '/api/userProfile', method: 'get', propertyName: 'user' },
+          logout: {url: '/api/logout', method: 'post'},
           
         }
       }

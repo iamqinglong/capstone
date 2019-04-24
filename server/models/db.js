@@ -14,6 +14,7 @@ require('./deviceEvent.model')
 require('./event.model')
 require('./notification.model')
 require('./userNotification.model')
-
+require('./reading.model')
+require('./sms.model')
 
 

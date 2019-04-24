@@ -27,10 +27,20 @@ export default {
     Navbar
   },
   async asyncData({store}) {
-      // await store.dispatch("notification/setUserMessagesRec")
+      await store.dispatch("notification/setUserMessagesRec")
  },
+//  async beforeCreate() {
+//       await this.$store.dispatch("notification/setUserMessagesRec")
+//  },
+//  async created() {
+//    await this.$store.dispatch("notification/setUserMessagesRec")
+//  },
+//  async beforeMount() {
+//    await this.$store.dispatch("notification/setUserMessagesRec")
+//  },
  async mounted() {
-    
+   
+    await this.$store.dispatch("notification/setUserMessagesRec")
     // if(this.$auth.loggedIn)
     // {
     //   this.$mqtt = await this.$mqtt

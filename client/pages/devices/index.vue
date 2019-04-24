@@ -94,7 +94,7 @@ export default {
   },
    async asyncData ({ params, error , $axios, store}) {
        await store.dispatch("notification/setUserMessagesRec")
-        return await $axios.get('/getAllDevice')
+        return await $axios.get('/api/getAllDevice')
 
     .then((res) => {
         return { devices : res.data}
@@ -113,31 +113,31 @@ export default {
     },
     async mounted() {
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
     methods: {
          async deleteDevice (id){
@@ -157,7 +157,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`/deleteDevice/${id}`)
+                        let res = await this.$axios.delete(`/api/deleteDevice/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -193,7 +193,7 @@ export default {
            
         },
         async getData() {
-            let res = await this.$axios.get('/getAllDevice')
+            let res = await this.$axios.get('/api/getAllDevice')
             this.devices = res.data
         }
     },

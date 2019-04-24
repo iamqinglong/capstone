@@ -9,7 +9,8 @@ const ctrlEvent = require('../controllers/event.controller')
 const ctrlDevTech = require('../controllers/deviceTechnician.controller')
 const ctrlNotification = require('../controllers/notification.controller')
 const ctrlUserNotification = require('../controllers/usernotification.controller')
-
+const ctrlReading = require('../controllers/reading.controller')
+const _sms = require('../sms')
 //Authentication
 router.post('/register', crtlUser.register)
 router.post('/authenticate', crtlUser.authenticate)
@@ -21,6 +22,8 @@ router.get('/getAllUsers', crtlUser.getAll)
 router.get('/getUserById/:id', crtlUser.getById)
 router.put('/updateUser/:id', crtlUser.update)
 router.post('/createUser', crtlUser.create)
+router.delete('/deleteUser/:id', crtlUser.delete)
+
 //Device
 router.post('/createDevice', crtlDevice.create)
 router.get('/getDevice/:id', crtlDevice.get)
@@ -29,6 +32,9 @@ router.get('/getDeviceTechnician/:id', crtlDevice.getDevTech)
 router.delete('/deleteDevice/:id', crtlDevice.delete)
 router.put('/updateDevice/:id', crtlDevice.update)
 router.get('/getAllNotDeviceTechnician/:id', crtlDevice.getAllNotDevTech)
+router.put('/updateStatusByTopic/', crtlDevice.updateStatus)
+router.get('/getDeviceByTopic/', crtlDevice.getDeviceByTopic)
+router.get('/getDeviceTechnicianByTopic/', crtlDevice.getDevTechByTopic)
 // router.post('/addTechnician/:id', crtlDevice.addTechnician)
 
 //Technician
@@ -58,4 +64,13 @@ router.get('/getNotification/:id', ctrlNotification.getNotif)
 //UserNotification
 router.post('/createUserNotification/:id', ctrlUserNotification.create)
 
+//Reading
+router.post('/insertReading/', ctrlReading.insert)
+router.get('/getNow', ctrlReading.get)
+router.post('/getByTopic', ctrlReading.getByTopic)
+
+//send sms
+
+router.post('/sendSms', _sms.sendSMS)
+router.post('/openModem', _sms.openModem)
 module.exports = router

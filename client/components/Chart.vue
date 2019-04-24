@@ -4,7 +4,7 @@
                     <div _ngcontent-c8="" _nghost-c10="" ng-reflect-id="1">
                         <div _ngcontent-c10="" class="row ng-star-inserted">
                         <div _ngcontent-c10="" class="box-title">
-                            <h2 _ngcontent-c10="" title="Hall temperature"> {{dev.device_name}}</h2>
+                            <h2 _ngcontent-c10="" title="Hall temperature"> {{device.device_name}}</h2>
                             <p _ngcontent-c10="" title="Show Today Live Statistics">Show Today Live Statistics</p>
                         </div>
                         </div>
@@ -17,7 +17,8 @@
                         </div>
                         </div>
                         <div class="containerMe" >
-                            <highcharts  :options="chartOptions"  class="highcharts-container" ref="chart" :updateArgs="[false,false]"></highcharts>
+                            <highcharts  v-if="device.status" :options="chartOptions"  class="highcharts-container" ref="chart" :updateArgs="[false,false]"></highcharts>
+                            <label v-else for="">No Activity yet/Disconnected</label>
                         </div>
 
                     
@@ -58,7 +59,7 @@ Vue.use(HighchartsVue);
 // import VueMqtt from 'vue-mqtt';
 // Vue.use(VueMqtt, 'ws://localhost:8000');
 
-// import mqtt from 'mqtt'
+// import mqtt from 'mqtt'  
 import style_ten from '@/static/css/style_ten.css'
 import style_thirteen from '@/static/css/style_thirteen.css'
 
@@ -72,6 +73,7 @@ export default {
     {
         return {
             // client: mqtt.connect('ws:127.0.0.1:8000'),
+            device: this.dev,
             current: 10,
             chartOptions: {
             chart: {
@@ -97,6 +99,7 @@ export default {
             },
 
             xAxis: {
+                type: 'datetime',
                 visible: false
             },
             plotOptions: {
@@ -117,7 +120,7 @@ export default {
                 enabled: false
             },
              series: [{
-                    name: 'Random data',
+                    name: this.dev.device_name,
                     data: (function () {
                         // generate an array of random data
                         var data = [],
@@ -150,28 +153,46 @@ export default {
  
     },
     async mounted () {
+        // console.log(this.device)
         this.$mqtt = await this.$mqtt
         // this.load();
-        this.$mqtt.subscribe(this.dev.data_source, 'Hello MQTT from NUXT')
-        const series = this.$children[0].chart.series[0];
+        this.$mqtt.subscribe(this.device.data_source, 'Hello MQTT from NUXT')
+        this.$mqtt.subscribe('/status')
+        // if(this.dev.status){
+            
+        // }
       
         // console.log(this.dev)
-        // this.$mqtt.on('message', (topic, message,packet)  => {
-        //     // message is Buffer
-        //     console.log('Topic: ',topic)
-        //     if(topic == this.dev.topic)
-        //     {
-        //         let msg = message.toString()
-        //         this.test(msg)
-        //         let time =  (new Date()).getTime();
-        //         series.addPoint([time, parseInt(msg)],true,true);
-        //     }
-        //     // console.log('Message: ', message.toString())
-        //     // this.current = parseInt(message);
-        //     // let value = Math.random() * 10;
-        //     // this.test(message.toString())
-        // })
-         // this.client.on('connect', function () {
+        this.$mqtt.on('message', async (topic, message,packet, payload)  => {
+            // message is Buffer
+           
+            if(topic == this.device.data_source)
+            {
+                const series = this.$children[0].chart.series[0];
+                // console.log('Topic: ',topic)
+                let msg = message.toString()
+                // console.log(msg)
+                this.setCurrent(msg)
+                let time =  (new Date()).getTime();
+                series.addPoint([time, parseInt(msg)],true,true);
+            }
+            else if(topic === '/status')
+            {
+                let msg = message.toString('utf8')
+                if(msg == this.device.data_source)
+                {
+                    console.log(msg)
+                    let result = await this.$axios.get(`/api/getDevice/${this.dev._id}`)
+                    this.device = result.data.device[0]
+                }
+               
+            }
+            // console.log('Message: ', message.toString())
+            // this.current = parseInt(message);
+            // let value = Math.random() * 10;
+            // this.test(message.toString())
+        })
+        //  this.client.on('connect', function () {
         // //subscribe to listen to the channels in which arduinos will be publishing
         //     console.log('Connected successfully to MQTT Broker')
             
@@ -191,11 +212,11 @@ export default {
         //         this.test(msg)
         //         let time =  (new Date()).getTime();
         //         series.addPoint([time, parseInt(msg)],true,true);
-            // }
-            // console.log('Message: ', message.toString())
-            // this.current = parseInt(message);
-            // let value = Math.random() * 10;
-            // this.test(message.toString())
+        //     }
+        //     // console.log('Message: ', message.toString())
+        //     // this.current = parseInt(message);
+        //     // let value = Math.random() * 10;
+        //     // this.test(message.toString())
             
         // })
         
@@ -219,10 +240,10 @@ export default {
                 let value = Math.random() * 10;
                 series.addPoint([time, value],true,true);
                 this.current = value.toFixed(2);
-                console.log(this.current)
+                // console.log(this.current)
                 }, 1000);
             },
-            test: function(value) {
+            async setCurrent(value) {
                 this.current = value;
             }
            
@@ -233,6 +254,8 @@ export default {
         // this.$forceUpdate();
         // this.client.end()
         this.$mqtt.unsubscribe(this.dev.data_source)
+        this.$mqtt.unsubscribe('/status')
+        // this.$mqtt.unsubscribe('/notification')
     },
 }
 </script>

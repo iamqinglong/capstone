@@ -514,4 +514,70 @@ module.exports.addTechnician = async (req, res,next) => {
       return next(error)
   }
   
+}
+
+module.exports.getDeviceByTopic = async (req, res, next) => {
+  try {
+    let device = await Device.findOne({data_source : req.query.topic })
+    return res.status(200).send( {status: true, device: device })
+  } catch (error) {
+    return next(error)
   }
+}
+
+module.exports.updateStatus = async (req, res, next) => {
+  try {
+
+      const device = {
+        status: req.body.status,
+      }
+      const { ...updatedData } = device
+      const update = await Device.findOneAndUpdate({data_source: req.query.topic},{$set: updatedData}, { new: true, runValidators: true, context: 'query' })
+      
+      return res.status(200).send( {status: true, 'message': `${update.device_name} Update successfully`} )
+  } catch (error) {
+    return next(error)
+  }
+}
+
+module.exports.getDevTechByTopic = async (req, res,next) => {
+
+  try {
+
+       let query =  Device.aggregate([
+      {
+        '$match': { data_source : req.query.topic }
+      },
+      { '$lookup': {
+        'from': DeviceTechnician.collection.name,
+        'localField': '_id',
+        'foreignField': 'devId',
+        'as': 'technicians'
+      }},
+      { '$unwind': '$technicians' },
+      { '$lookup': {
+          'from': Technician.collection.name,
+          'localField': 'technicians.techId',
+          'foreignField': '_id',
+          'as': 'technicians',
+        }
+      },
+      { '$unwind': '$technicians' },
+      { '$group': {
+        '_id': '$_id',
+        'topic': { '$first': '$topic' },
+        'technicians_numbers': { '$push': '$technicians.phone_number' }
+      }}
+    ]);
+
+    
+    // return res.status(200).send( { device, technicians: device.technicians })
+     query.exec((err, device) => {
+        return res.status(200).send( {status: true, device: device} )
+    })
+  } catch (error) {
+      // res.status(500).send({error, 'message' : 'Sorry, error on updating!'})
+      return next(error)
+  }
+ 
+}

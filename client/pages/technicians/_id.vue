@@ -34,9 +34,19 @@
                                                             <small class="form-text text-danger" v-if="errors.last_name">{{errors.last_name}}</small>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <!-- <div class="form-group">
                                                         <label for="" class="col-form-label">Phone</label>
                                                         <input v-model.trim="tech.phone_number" type="number" class="form-control" id="" placeholder="Phone">
+                                                    </div> -->
+                                                     <div class="form-group">
+                                                        <label for="" class="col-form-label">Phone</label>
+                                                        <vue-phone-number-input v-model="tech.phone_number" 
+                                                        :only-countryies="onlyCountries"
+                                                        :default-country-code="defaultCountry"
+                                                        @update="onUpdate"
+                                                        />
+                                                        <small class="form-text text-danger" v-if="errors.phoneNumber">{{errors.phoneNumber}}</small> 
+                                                        <!-- <input v-model.trim="form.phone_number" type="number" class="form-control" id="" placeholder="Phone"> -->
                                                     </div>
                                                    
                                                     <button @click.prevent="update" type="submit" class="btn btn-primary">Update Technician</button>
@@ -67,11 +77,13 @@
     </div>
 </template>
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
     data() {
         return {
-           
+           onlyCountries: ['PH'],
+            defaultCountry: 'PH',
+            results: {},
         }
     },
     // validate ({ params }) {
@@ -81,7 +93,7 @@ export default {
     async asyncData ({ params, error, $axios, store }) {
         
       await store.dispatch("notification/setUserMessagesRec")
-      return  await $axios.get(`/getTechnician/${params.id}`)
+      return  await $axios.get(`/api/getTechnician/${params.id}`)
         
     .then((res) => {
         return { 
@@ -116,31 +128,31 @@ export default {
       this.data = this.technician
       
       this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                // this.$store.dispatch("notification/newMessageNotification", msg[0])
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         // this.$store.dispatch("notification/newMessageNotification", msg[0])
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
    
     methods: {
@@ -159,16 +171,38 @@ export default {
            else
            {
                 try {
+                    if(this.results.isValid & this.results.countryCode == 'PH'){
+                        let res = await this.$axios.put(`/api/updateTechnician/${this.tech.id}`, {
 
-                    await this.$axios.put(`/updateTechnician/${this.tech.id}`, {
+                            first_name: this.tech.first_name,
+                            last_name: this.tech.last_name,
+                            phone_number: this.results.formattedNumber, 
 
-                        first_name: this.tech.first_name,
-                        last_name: this.tech.last_name,
-                        phone_number: this.tech.phone_number, 
+                        })
+                        console.log(res.data)
+                         if(res.data.nModified == 1)
+                        {
+                            this.$swal.fire({
+                                title: 'Updated!',
+                                text: `${this.tech.first_name} updated successfully`,
+                                type: 'success',
+                                confirmButtonText: 'Ok'
+                            })
 
-                    })
-
-                    this.$router.back()
+                            this.$router.back();
+                        }
+                        else
+                        {
+                            this.$swal.fire({
+                                        title: 'Error!',
+                                        text: `Update error`,
+                                        type: 'error',
+                                        confirmButtonText: 'Ok'
+                                    })
+                        }
+                    }else{
+                        this.$store.dispatch("validation/setErrors", {phoneNumber : `Invalid input`})
+                    }
                 } catch (error) {
 
                     console.log(error.message)
@@ -194,7 +228,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`/deleteTech/${this.tech.id}`)
+                        let res = await this.$axios.delete(`/api/deleteTech/${this.tech.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -230,6 +264,9 @@ export default {
                 console.log(error)
             }
            
+        },
+        onUpdate(payload) {
+            this.results = payload
         },
     },
     destroyed() {

@@ -133,6 +133,9 @@
                                            :class="[message.users.length == 0 ? 'unread':'read']"
                                            :visibleNotif="visibleNotif"
                                            :currentPage="currentPage">
+                                              <td>
+                                                  {{message._id}}
+                                              </td>
                                                 <td class="mail-select">
                                                   <i class="fa fa-circle m-l-5 text-warning"></i>
                                               </td>
@@ -183,7 +186,9 @@
   // import "izitoast/dist/css/iziToast.css";
 
   // Vue.use(VueIziToast);
+  // import Vue from 'vue';
   
+
   import redirect from '~/assets/js/redirect'
   export default {
     data() {
@@ -211,7 +216,7 @@
     // if(this.$auth.loggedIn)
     // {
         this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
+        // this.$mqtt.subscribe('/notification')
         this.$mqtt.on('message', (topic, message,packet)  => {
             
             if(topic === '/notification')
@@ -219,6 +224,7 @@
                 let msg = JSON.parse( message.toString('utf8') )
                 // this.$store.dispatch("notification/newMessageNotification", msg[0])
                 this.$store.dispatch("notification/setUserMessagesRec")
+                this.updateVisibleNotif()
             }
             
         })
@@ -235,7 +241,7 @@ methods: {
     // console.log('user_id '+this.user._id)
     // console.log('notifId '+id)
     try {
-        await this.$axios.post(`/createUserNotification/${this.user._id}`, {
+        await this.$axios.post(`/api/createUserNotification/${this.user._id}`, {
           notifId: id
       })
       // console.log("SUCCESS")
@@ -248,8 +254,9 @@ methods: {
     this.updateVisibleNotif()
   },
   async updateVisibleNotif () {
+    
     this.visibleNotif = this.notification.messagesRec.slice((this.currentPage * this.pageSize), (this.currentPage * this.pageSize) + this.pageSize )
-
+    // console.log(this.visibleNotif)
     if(this.visibleNotif.length == 0 && this.currentPage > 0){
       this.updatePage( this.currentPage -1 )
     }
@@ -302,12 +309,16 @@ methods: {
             }
     })
   },
+ 
   // async redirect()
   // {
   //   this.$router.push('/devices');
   // }
 
-},
+  },
+ async destroyed() {
+    // this.$mqtt.unsubscribe('/notification')
+  },
 
   }
 </script>

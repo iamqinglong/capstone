@@ -98,8 +98,8 @@ export default {
         const [evId, devId ] = params.id.split('_')
 
         let [event, device] =  await Promise.all([ 
-                                 $axios.get(`/getEvent/${evId}`),
-                                 $axios.get(`/getDevice/${devId}`),
+                                 $axios.get(`/api/getEvent/${evId}`),
+                                 $axios.get(`/api/getDevice/${devId}`),
                               ])
         return {
             devId: devId,
@@ -126,31 +126,31 @@ export default {
                 { value: 'idle for', text: `${this.device.device_name} is idle for` },)
 
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
 
         
     },
@@ -158,7 +158,7 @@ export default {
         async create () {
             try {
                
-                let result = await this.$axios.post(`/createEvent/${this.id}`,{
+                let result = await this.$axios.post(`/api/createEvent/${this.id}`,{
 
                     condition: this.selectedCondition,
                     statement: this.selectedStatement,
@@ -227,7 +227,7 @@ export default {
            else
            {
                 
-                let res = await this.$axios.post(`/updateEvent/${this.devId}`, {
+                let res = await this.$axios.post(`/api/updateEvent/${this.devId}`, {
                     id: this.id,
                     condition: this.selectedCondition,
                     statement: this.selectedStatement,

@@ -295,14 +295,14 @@ module.exports.getAllByTopic = async (req, res,next) => {
         }
       },
       { '$unwind': '$events' },
-      {
-        "$addFields": 
-          {
-              "events.statement": {
-                  $concat: ['$device_name',' ','$events.statement']
-              },
-          },
-      },
+      // {
+        // "$addFields": 
+        //   {
+        //       "events.statement": {
+        //           $concat: ['$device_name',' ','$events.statement']
+        //       },
+        //   },
+      // },
       
          { '$group': {
         '_id': '$_id',

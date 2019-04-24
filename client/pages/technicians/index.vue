@@ -121,7 +121,7 @@ export default {
         },
     async asyncData ({ params, error, $axios, store }) {
         await store.dispatch("notification/setUserMessagesRec")
-        return await $axios.get('/getAllTechnician')
+        return await $axios.get('/api/getAllTechnician')
 
     .then((res) => {
         return { technician : res.data}
@@ -136,32 +136,19 @@ export default {
     async mounted() {
       this.data = this.technician
       
-      this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+      // this.$mqtt = await this.$mqtt
+      // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                // this.$store.dispatch("notification/newMessageNotification", msg[0])
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         // this.$store.dispatch("notification/newMessageNotification", msg[0])
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
-                                    
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
-
-            }
+        //     }
             
-        })
+        // })
     },
     methods: {
          async deleteTech (id){
@@ -181,7 +168,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`/deleteTech/${id}`)
+                        let res = await this.$axios.delete(`/api/deleteTech/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -213,9 +200,12 @@ export default {
         },
         
         async getData() {
-            let res = await this.$axios.get('/getAllTechnician');
+            let res = await this.$axios.get('/api/getAllTechnician');
             this.data = res.data;
         }
+    },
+    async destroyed() {
+      // this.$mqtt.unsubscribe('/notification')
     },
     
 };

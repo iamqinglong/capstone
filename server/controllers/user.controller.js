@@ -106,6 +106,18 @@ module.exports.getById = async (req,res,next) => {
     
 }
 
+module.exports.delete = async (req,res,next) => {
+
+    try {
+
+        let user = await User.findOneAndDelete({ _id: req.params.id},)
+        return res.status(200).json({status: true, message: `${user.firstName} successfully deleted!` })
+
+    } catch (error) {
+        return next(error)
+    }
+    
+}
 module.exports.update = async (req,res,next) => {
 
     try {

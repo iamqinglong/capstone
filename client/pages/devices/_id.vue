@@ -21,25 +21,26 @@
                                                     Here you can modify display name or other general information
                                                 </p>
 
-                                                <form>
+                                                <form @submit.prevent="update">
                                                     <div class="form-row">
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Device Name</label>
-                                                            <input  v-model.trim="device.device_name" class="form-control" id="" placeholder="Device Name" >
+                                                            <input  v-model.trim="device.device_name" required="true" class="form-control" id="" placeholder="Device Name" >
                                                             <small class="form-text text-danger" v-if="errors.device_name">{{errors.device_name}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Data Source</label>
-                                                            <input v-model.trim="device.data_source" type="text" class="form-control" id="" placeholder="Data Source">
+                                                            <input disabled v-model.trim="device.data_source" required="true" type="text" class="form-control" id="" placeholder="Data Source">
                                                             <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="" class="col-form-label">Location</label>
-                                                        <input v-model.trim="device.location" type="text" class="form-control" id="" placeholder="Set device location">
+                                                        <input v-model.trim="device.location" required="true" type="text" class="form-control" id="" placeholder="Set device location">
                                                     </div>
                                                    
-                                                    <button @click.prevent="update" type="submit" class="btn btn-primary">Update Device</button>
+                                                    <!-- <button @click.prevent="update" type="submit" class="btn btn-primary">Update Device</button> -->
+                                                    <button  type="submit" class="btn btn-primary">Update Device</button>
                                                     <button @click.prevent="deleteDevice" type="submit" class="btn btn-danger">Delete Device</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning">Cancel</button>
                                                 </form>
@@ -54,7 +55,7 @@
                 </div> <!-- end container -->
         </div>
         <!-- Footer -->
-        <footer class="footer">
+        <!-- <footer class="footer">
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
@@ -62,12 +63,12 @@
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer> -->
         <!-- End Footer -->
     </div>
 </template>
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
     middleware: 'auth',
     data() {
@@ -84,7 +85,7 @@ export default {
     },
     async asyncData ({ params, error, $axios, store}) {
         await store.dispatch("notification/setUserMessagesRec")
-      return await $axios.get(`/getDevice/${params.id}`)
+      return await $axios.get(`/api/getDevice/${params.id}`)
         
     .then((res) => {
         // console.log(res.data.device[0]._id)
@@ -118,31 +119,31 @@ export default {
     
     async mounted() {
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
     
     methods: {
@@ -162,7 +163,7 @@ export default {
            {
                 try {
 
-                    let res = await this.$axios.put(`/updateDevice/${this.device.id}`, {
+                    let res = await this.$axios.put(`/api/updateDevice/${this.device.id}`, {
 
                          device_name: this.device.device_name,
                         data_source: this.device.data_source,
@@ -200,7 +201,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`/deleteDevice/${this.device.id}`)
+                        let res = await this.$axios.delete(`/api/deleteDevice/${this.device.id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({

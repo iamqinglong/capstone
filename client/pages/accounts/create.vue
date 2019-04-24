@@ -20,38 +20,39 @@
                                                     Here you can modify display name or other general information
                                                 </p>
 
-                                                <form>
+                                                <form @submit.prevent="create">
                                                     <div class="form-row">
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">First Name</label>
-                                                            <input v-model="firstName" type="text" required="" class="form-control" id="" placeholder="First Name">
+                                                            <b-form-input v-model="firstName" type="text" required="" class="form-control" id="" placeholder="First Name"></b-form-input>
                                                             <small class="form-text text-danger" v-if="errors.firstName">{{errors.firstName}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Last Name</label>
-                                                            <input v-model="lastName" type="text" required="" class="form-control" id="" placeholder="Last Name">
+                                                            <input v-model="lastName" type="text" required="true" class="form-control" id="" placeholder="Last Name">
                                                             <small class="form-text text-danger" v-if="errors.lastName">{{errors.lastName}}</small>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="" class="col-form-label">Email</label>
-                                                        <input v-model="email" type="email" required="" class="form-control" id="" placeholder="Email">
+                                                        <!-- <input name="email" v-model="email" class="form-control" type="email" placeholder="Email"> -->
+                                                        <input v-model="email" type="email" required="true" class="form-control" id="" placeholder="Email">
                                                         <small class="form-text text-danger" v-if="errors.email">{{errors.email}}</small>
                                                     </div>
                                                     <div class="form-row">
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Password</label>
-                                                            <input v-model="password" type="password" required="" class="form-control" id="" placeholder="Password">
+                                                            <input v-model="password" type="password" required="true" class="form-control" id="" placeholder="Password">
                                                             <small class="form-text text-danger" v-if="errors.password">{{errors.Password}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
                                                             <label for="" class="col-form-label">Confirm Password</label>
-                                                            <input v-model="confirm" type="password" required="" class="form-control" id="" placeholder="Confirm">
+                                                            <input v-model="confirm" type="password" required="true" class="form-control" id="" placeholder="Confirm">
                                                             <small class="form-text text-danger" v-if="errors.confirm">{{errors.confirm}}</small>
                                                         </div>
                                                     </div>
                                                    
-                                                    <button @click.prevent="create" type="submit" class="btn btn-primary">Create Account</button>
+                                                    <button type="submit" class="btn btn-primary">Create Account</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
                                                 </form>
                                             </div>
@@ -87,31 +88,31 @@ export default {
     },
     async mounted() {
 
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
     methods: {
         async create () {
@@ -119,7 +120,7 @@ export default {
                 
                 if(this.confirm === this.password)
                 {
-                    let result = await this.$axios.post('/createUser',{
+                    let result = await this.$axios.post('/api/createUser',{
 
                         firstName: this.firstName,
                         lastName: this.lastName,

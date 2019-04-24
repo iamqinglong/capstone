@@ -51,7 +51,7 @@
                                           </p>
                                           <div >
                                             
-                                              <button  type="button" class="btn btn-primary waves-effect waves-light" @click="showModal">Add Technician</button>
+                                              <button  type="button" class="btn btn-primary waves-effect waves-light" @click="showModal">Assign a Technician</button>
                                             
                                           </div>
                                         </div>
@@ -213,9 +213,9 @@ import style_thirteen from '@/static/css/style_thirteen.css'
     async asyncData ({ params, error, $axios, store }) {
       await store.dispatch("notification/setUserMessagesRec")
       
-      let [device, technician, events] =  await Promise.all([ $axios.get(`/getDeviceTechnician/${params.id}`),
-                                 $axios.get(`/getAllNotDeviceTechnician/${params.id}`),
-                                 $axios.get(`/getDeviceEvent/${params.id}`)
+      let [device, technician, events] =  await Promise.all([ $axios.get(`/api/getDeviceTechnician/${params.id}`),
+                                 $axios.get(`/api/getAllNotDeviceTechnician/${params.id}`),
+                                 $axios.get(`/api/getDeviceEvent/${params.id}`)
                               ])
       // console.log(technician.data)
       // console.log(events.data)
@@ -249,36 +249,36 @@ import style_thirteen from '@/static/css/style_thirteen.css'
         this.avail = this.availTechnicians.technician
 
         
-        this.$mqtt = await this.$mqtt
-        this.$mqtt.subscribe('/notification')
-        this.$mqtt.on('message', async (topic, message,packet)  => {
+        // this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
             
-            if(topic === '/notification')
-            {
-                let msg = JSON.parse( message.toString('utf8') )
-                await this.$store.dispatch("notification/setUserMessagesRec")
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
 
-                this.$izitoast.warning({
-                                    title: 'Caution',
-                                    message: `${msg[0].subject}`,
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
                                     
-                                        closeOnClick: true,
-                                        onClosing: function(instance, toast, closedBy) {
-                                        console.info("Closing | closedBy: " + closedBy);
-                                        },
-                                        onClosed: function(instance, toast, closedBy) {
-                                        console.info("Closed | closedBy: " + closedBy);
-                                        }
-                                    })
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
 
-            }
+        //     }
             
-        })
+        // })
     },
      methods: {
        async getData(){
-         let [device, technician] =  await Promise.all([ this.$axios.get(`/getDeviceTechnician/${this.id}`),
-                                 this.$axios.get(`/getAllNotDeviceTechnician/${this.id}`)
+         let [device, technician] =  await Promise.all([ this.$axios.get(`/api/getDeviceTechnician/${this.id}`),
+                                 this.$axios.get(`/api/getAllNotDeviceTechnician/${this.id}`)
                               ])
         
           if(device.data.device.length != 0 ) this.tech = device.data.device[0].technicians
@@ -291,7 +291,7 @@ import style_thirteen from '@/static/css/style_thirteen.css'
       },
       async save() {
 
-        let res = await this.$axios.post(`/createDevTech/${this.id}`,{
+        let res = await this.$axios.post(`/api/createDevTech/${this.id}`,{
              techIds: this.checkedRows
         })
         this.getData();
@@ -320,7 +320,7 @@ import style_thirteen from '@/static/css/style_thirteen.css'
                     })
                     if (result) {
                         
-                        let res = await this.$axios.post(`/deleteDevTech`,{
+                        let res = await this.$axios.post(`/api/deleteDevTech`,{
                           devId: this.id,
                           techId: id
                         })
@@ -368,7 +368,7 @@ import style_thirteen from '@/static/css/style_thirteen.css'
                     })
                     if (result) {
                         
-                        let res = await this.$axios.post('/deleteEvent',{
+                        let res = await this.$axios.post('/api/deleteEvent',{
 
                           devId: this.id,
                           evId: param,
@@ -400,7 +400,7 @@ import style_thirteen from '@/static/css/style_thirteen.css'
         
         async getEventData()
         {
-          let res = await this.$axios.get(`/getDeviceEvent/${this.id}`)
+          let res = await this.$axios.get(`/api/getDeviceEvent/${this.id}`)
           if(res.data.length != 0) this.event = res.data[0].events
           else this.event = []
           console.log(res.data.length)

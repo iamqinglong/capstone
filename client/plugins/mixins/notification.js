@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
-// import redirect from '~/assets/js/redirect'
+import { mapGetters } from 'vuex'
 const Notification = {
     install (Vue, options) {
         Vue.mixin({
@@ -9,14 +9,9 @@ const Notification = {
                     notification : state => state.notification
                   }),
                 // ...mapGetters({
-                //     notification : 'notification/msgRec'
+                //     // notification : 'notification/msgRec'
                 //   })
             },
-            // method : {
-            //     redirect() {
-            //         redirect.myFunction1()
-            //     }
-            // }
         })
     }
 }
