@@ -31,11 +31,35 @@ const deviceSchema = new mongoose.Schema({
         required: `Location can't be empty`,
         validate: nameValidator
     },
+    symbol: {
+        type: String,
+        // unique: true,
+        required: `Symbol can't be empty`,
+        // validate: nameValidator
+    },
+    status : {
+        type: Boolean,
+        default: false
+    }
 })
 
 
 deviceSchema.virtual('technicians', {
     ref: 'DeviceTechnician',
+    localField: '_id',
+    foreignField: 'devId',
+    justOne: false // set true for one-to-one relationship
+})
+
+deviceSchema.virtual('events', {
+    ref: 'DeviceEvent',
+    localField: '_id',
+    foreignField: 'devId',
+    justOne: false // set true for one-to-one relationship
+})
+
+deviceSchema.virtual('notifications', {
+    ref: 'DeviceNotification',
     localField: '_id',
     foreignField: 'devId',
     justOne: false // set true for one-to-one relationship

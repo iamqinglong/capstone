@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const passport = require('passport')
 const _ = require('lodash')
+const bcrypt = require('bcrypt');
 
 module.exports.register = (req,res,next) => {
     let user = new User()
@@ -70,7 +71,7 @@ module.exports.userProfile = (req,res,next) => {
             if(!user)
                 return res.status(404).json({ status: false, message: 'User record not found'})
             else
-                return res.status(200).json({status: true, user: _.pick(user,['fullName','lastName','email'])})
+                return res.status(200).json({status: true, user: _.pick(user,['_id','firstName','lastName','email', 'number'])})
         }
     )
 }
@@ -79,4 +80,104 @@ module.exports.logout = (req,res,next) => {
     req.logout()
     res.redirect('/');
     // res.status(200).json({ status: true, message: 'Logout succesfully'})
+}
+
+module.exports.getAll = async (req,res,next) => {
+    try {
+        let user = await User.find({}, {password:0}).exec();
+        return res.status(200).send( user )
+    } catch (error) {
+        return next(error)
+    }
+   
+}
+
+module.exports.getById = async (req,res,next) => {
+
+    try {
+
+        let user = await User.findOne({ _id: req.params.id},)
+        // return res.status(200).send( user )
+        return res.status(200).json({status: true, user: _.pick(user,['_id','firstName','lastName','email','number'])})
+
+    } catch (error) {
+        return next(error)
+    }
+    
+}
+
+module.exports.delete = async (req,res,next) => {
+
+    try {
+
+        let user = await User.findOneAndDelete({ _id: req.params.id},)
+        return res.status(200).json({status: true, message: `${user.firstName} successfully deleted!` })
+
+    } catch (error) {
+        return next(error)
+    }
+    
+}
+module.exports.update = async (req,res,next) => {
+
+    try {
+
+        // const id = req.params.id
+        const user =  await User.findById(req.params.id);
+        // const user = {
+              user.firstName = capital_letter(req.body.firstName),
+              user.lastName = capital_letter(req.body.lastName),
+              user.password = req.body.password,
+              user.email = req.body.email,
+              user.number = req.body.number
+        // }
+        const result = await user.save();
+        // console.log(result)
+        let tempUser = {
+            _id: result._id,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            number: result.number
+        }
+        // const { ...updateData } = user
+        // const update = await User.update({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
+        return res.status(200).send( { status: true, user: tempUser, message: `${req.body.firstName} details updated to ${result.firstName} details successfully!`} )
+        
+    } catch (error) {
+       
+        return next(error)
+    }
+}
+
+module.exports.create = async (req,res,next) => {
+
+    try {
+
+        let user = new User({
+            firstName: capital_letter(req.body.firstName.toLowerCase()),
+            lastName: capital_letter(req.body.lastName.toLowerCase()),
+            email:req.body.email,
+            password: req.body.password,
+            number: req.body.number
+        })
+        
+        let result = await user.save()
+        
+        return res.send({status: true, message: `${result.firstName} succesffully created!`})
+
+    } catch (error) {
+        return next(error)
+    }
+   
+}
+function capital_letter(str) 
+{
+    str = str.split(" ");
+
+    for (let i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+    return str.join(" ");
 }

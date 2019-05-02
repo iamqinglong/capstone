@@ -15,22 +15,28 @@
                                     <div class="col-lg-12">
                                     <div class="card-box">
                                         <div>
-                                          <h4 class="m-t-0 header-title">Devices</h4>
+                                          <h4 class="m-t-0 header-title">Technicians</h4>
                                           <p class="text-muted font-14 m-b-20">
-                                             List of Devices
+                                             List of Technicians
                                           </p>
                                           <div >
-                                            <nuxt-link to="/devices/create">
-                                              <button type="button" class="btn btn-primary waves-effect waves-light">Connect a new device</button>
+                                            <nuxt-link to="/technicians/create">
+                                              <button type="button" class="btn btn-primary waves-effect waves-light">New Technician</button>
                                             </nuxt-link> 
                                           </div>
                                         </div>
                                         <br>
                                         <div>
                                            <v-client-table :data="data" :columns="columns" :options="options"> 
-                                             <a slot="email" slot-scope="props" :href="`mailto:${props.row.email}`">
-                                              {{props.row.email}}
-                                            </a>
+                                            
+                                            <span slot="actions" slot-scope="{row}">
+                                              
+                                                <!-- <button v-on:click="edit(row.id)">Edit</button> -->
+                                                <nuxt-link :to="'/technicians/' + row._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
+                                                <a  @click.prevent="deleteTech(row._id)" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></a>
+                                                <!-- <nuxt-link :to="'/' + row.id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link> -->
+                                            </span>
+
                                            </v-client-table>
                                         </div>
                                        
@@ -45,7 +51,7 @@
             </div> <!-- end container -->
       </div>
       <!-- Footer -->
-      <footer class="footer">
+      <!-- <footer class="footer">
           <div class="container">
               <div class="row">
                   <div class="col-12 text-center">
@@ -53,27 +59,21 @@
                   </div>
               </div>
           </div>
-      </footer>
+      </footer> -->
       <!-- End Footer -->
   	
   	</div>
 </template>
 
 <script>
-// import { mapGetters } from 'vuex';
 import Devices from '@/components/Devices.vue'
-// import style_devices from '@/static/css/style_device.css'
 import style_ten from '@/static/css/style_ten.css'
 import style_thirteen from '@/static/css/style_thirteen.css'
 
-import axios from 'axios'
+// import axios from 'axios'
 import Vue from 'vue'
 import {ClientTable, Event} from 'vue-tables-2';
 Vue.use(ClientTable);
-// import daterangepicker from 'daterangepicker';
-//This is very important to used with the window object
-// window.moment = require('moment')
-// import moment from 'moment'
 
 export default {
   middleware: 'auth',
@@ -81,24 +81,28 @@ export default {
       Devices
   },
   computed: {
-    // ...mapGetters(['loggedInUser']),
   },
   data(){
             return {
                   columns: [
-                  'id',
-                  'name',
-                  'email'
+                  // '_id',
+                  'first_name',
+                  'last_name',
+                  'phone_number',
+                  'actions'
                   ],
-                data: this.getData(),
+                data: [],
                 options: {
                   headings: {
-                    id: 'id',
-                    name: 'name',
-                    email: 'email'
+                    // _id: {columnsDisplay: true},
+                    first_name: 'First Name',
+                    last_name: 'Last Name',
+                    phone_number: 'Phone Number',
+                    actions: 'Actions'
                   },
                   sortable: [
-                    'id', 'name'
+                    // '_id', 
+                    'first_name', 'last_name'
                     ],
                   texts: {
                     filterPlaceholder: 'filter'
@@ -111,17 +115,16 @@ export default {
                   },
                   texts: {
                     filter: ''
-                  }, 
+                  },
               },
             }   
         },
-    async asyncData ({ params, error }) {
-
-        return await axios.get('http://localhost:8000/api/getAllDevice')
+    async asyncData ({ params, error, $axios, store }) {
+        // await store.dispatch("notification/setUserMessagesRec")
+        return await $axios.get('/api/getAllTechnician')
 
     .then((res) => {
-        console.log(res.data)
-        return { devices : res.data}
+        return { technician : res.data}
 
     })
     .catch((e) => {
@@ -130,8 +133,25 @@ export default {
 
     })
     },
+    async mounted() {
+      this.data = this.technician
+      
+      // this.$mqtt = await this.$mqtt
+      // this.$mqtt.subscribe('/notification')
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         // this.$store.dispatch("notification/newMessageNotification", msg[0])
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
+
+        //     }
+            
+        // })
+    },
     methods: {
-         async deleteDevice (id){
+         async deleteTech (id){
             try {
                
               
@@ -148,7 +168,7 @@ export default {
                     })
                     if (result) {
                 
-                        let res = await this.$axios.delete(`http://localhost:8000/api/deleteDevice/${id}`)
+                        let res = await this.$axios.delete(`/api/deleteTech/${id}`)
                         if(!res.data.status){
 
                             this.$swal.fire({
@@ -160,21 +180,17 @@ export default {
 
                         }
                         else{
-                        
+                            this.getData();
                             this.$swal.fire({
                                 title: 'Deleted!',
                                 text: `${res.data.message}`,
                                 type: 'success',
                             })
-                            this.$router.push('/devices');
+                            this.$router.push('/technicians');
                             // console.log(result)
                         }
 
-                        // this.$swal.fire(
-                        // 'Deleted!',
-                        // 'Your file has been deleted.',
-                        // 'success'
-                        // )
+                        
                     }
                 
             } catch (error) {
@@ -183,32 +199,29 @@ export default {
            
         },
         
-        getData() {
-          const arr = []
-          for (var i = 0; i < 20; i++) {
-            arr.push({
-              'id': i,
-              'name': `sample${i}`,
-              'email': `sample${i}@example.com`,
-              'group_name': 'Personnel'
-            });
-          }
-          return arr;
+        async getData() {
+            let res = await this.$axios.get('/api/getAllTechnician');
+            this.data = res.data;
         }
+    },
+    async destroyed() {
+      // this.$mqtt.unsubscribe('/notification')
     },
     
 };
 </script>
 
-<style type="scss">
+<style  scoped>
 #app {
   width: 95%;
   margin-top: 50px; 
 }
   .table {
-    color: #f2f5f9;
+    color: #fafafa;
 }
-
+.body {
+    color: #fafafa;
+}
 .VuePagination {
   text-align: center;
 }
@@ -250,7 +263,7 @@ th:nth-child(3) {
 }
 
 .table .thead-dark th {
-    color: #fff;
+    color: #fafafa;
     background-color: #343a40;
     border-color: #454d55;
 }

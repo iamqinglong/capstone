@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validate = require('mongoose-validator')
+const uniqueValidator = require('mongoose-unique-validator');
 const jwt = require('jsonwebtoken')
 var Schema = mongoose.Schema;
 
@@ -16,12 +17,16 @@ let nameValidator = [
 const technicianSchema = new mongoose.Schema({
     first_name :{
         type: String,
+        unique: true,
+        // lowercase: true,
         required: `First name can't be empty`,
         validate: nameValidator
     },
     last_name: {
         type: String,
         required: `Last name can't be empty`,
+        // lowercase: true,
+        unique: true,
         validate: nameValidator
     },
     phone_number: {
@@ -37,4 +42,5 @@ technicianSchema.virtual('devices', {
     justOne: false // set true for one-to-one relationship
 })
 
+technicianSchema.plugin(uniqueValidator, { message: 'Error, {VALUE} is already acquired' });
 mongoose.model('Technician', technicianSchema)

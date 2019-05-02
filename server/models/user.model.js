@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validate = require('mongoose-validator')
 const jwt = require('jsonwebtoken')
-
+const uniqueValidator = require('mongoose-unique-validator');
 let nameValidator = [
     validate({
       validator: 'matches',
@@ -27,11 +27,13 @@ let passValidator = [
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
+        unique: true,
         required: `First name can't be empty`,
         validate: nameValidator
     },
     lastName: {
         type: String,
+        unique: true,
         required: `Last name can't be empty`,
         validate: nameValidator
     },
@@ -44,6 +46,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required:  `Password can't be empty`,
         validate: passValidator
+    },
+    number: {
+        type: String,
+        required:  `Number can't be empty`,
+        unique: true
     },
     saltSecret: String
 })
@@ -79,4 +86,5 @@ userSchema.methods.generateJWT = function() {
             // expiresIn: process.env.JWT_EXP
         })
 }
+userSchema.plugin(uniqueValidator, { message: 'Error, {VALUE} is already acquired' });
 mongoose.model('User', userSchema)

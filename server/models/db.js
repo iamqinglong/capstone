@@ -10,7 +10,11 @@ require('./user.model')
 require('./device.model')
 require('./technician.model')
 require('./deviceTechnician.model')
+require('./deviceEvent.model')
+require('./event.model')
+require('./notification.model')
+require('./userNotification.model')
+require('./reading.model')
+require('./sms.model')
 
-// require('./store.model')
-// require('./item.model')
 

@@ -24,7 +24,7 @@
             </div> <!-- end container -->
       </div>
       <!-- Footer -->
-      <footer class="footer">
+      <!-- <footer class="footer">
           <div class="container">
               <div class="row">
                   <div class="col-12 text-center">
@@ -32,7 +32,7 @@
                   </div>
               </div>
           </div>
-      </footer>
+      </footer> -->
       <!-- End Footer -->
   	
   	</div>
@@ -40,7 +40,6 @@
 
 <script >
 import Chart from '@/components/Chart.vue'
-import axios from 'axios'
 export default {
     components: {
         chart: Chart
@@ -63,9 +62,9 @@ export default {
         //         }
         }
     },
-    asyncData ({ params, error }) {
-
-        return axios.get('http://localhost:8000/api/getAllDevice')
+    async asyncData ({ params, error, $axios, store }) {
+        // await store.dispatch("notification/setUserMessagesRec")
+        return $axios.get('/api/getAllDevice')
 
         .then((res) => {
             // console.log(res.data)
@@ -78,7 +77,39 @@ export default {
 
         })
     },
-    mounted() {
+    async mounted() {
+        // console.log(this.devices)
+        this.$router.push('/')
+        this.$mqtt = await this.$mqtt
+        // this.$mqtt.subscribe('/notification')
+        // await this.$store.dispatch("notification/setUserMessagesRec")
+        // this.$mqtt.on('message', async (topic, message,packet)  => {
+            
+        //     if(topic === '/notification')
+        //     {
+        //         let msg = JSON.parse( message.toString('utf8') )
+        //         await this.$store.dispatch("notification/setUserMessagesRec")
+
+        //         this.$izitoast.warning({
+        //                             title: 'Caution',
+        //                             message: `${msg[0].subject}`,
+                                    
+        //                                 closeOnClick: true,
+        //                                 onClosing: function(instance, toast, closedBy) {
+        //                                 console.info("Closing | closedBy: " + closedBy);
+        //                                 },
+        //                                 onClosed: function(instance, toast, closedBy) {
+        //                                 console.info("Closed | closedBy: " + closedBy);
+        //                                 }
+        //                             })
+
+        //     }
+            
+        // })
+
+    },
+    async destroyed() {
+        //  this.$mqtt.unsubscribe('/notification')
     },
 }
 </script>

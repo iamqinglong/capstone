@@ -44,7 +44,7 @@
                 <div class="form-group row m-t-30">
                     <div class="col-sm-7">
                         
-                         <nuxt-link to="/register">Create an account</nuxt-link>
+                         <!-- <nuxt-link to="/register">Create an account</nuxt-link> -->
                     </div>
                 </div>
             </form>
@@ -75,6 +75,7 @@ export default {
             password: this.password,
           },
         });
+        this.$store.dispatch("notification/setUserMessagesRec")
         // console.log(res)
         // this.$router.push('/');
       } catch (e) {

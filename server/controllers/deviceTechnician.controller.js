@@ -2,32 +2,39 @@ const mongoose = require('mongoose')
 const DeviceTechnician = mongoose.model('DeviceTechnician')
 const _ = require('lodash')
 
-module.exports.create = (req,res,next) => {
-    // res.send('Greetings from the Device controller!');
-
-    let devTech = new DeviceTechnician(
-        {
-            devId: req.body.devId,
-            techId: req.body.techId,
+module.exports.create = async (req,res,next) => {
+    try {
+        let devId = mongoose.Types.ObjectId(req.params.id);
+        let techIds = req.body.techIds;
         
-        }
-    );
+        techIds.forEach( async (element) => {
+            let devTech = {
+                devId : devId,
+                techId : element
+              }
+              let { ...updateData } = devTech
+              
+            await DeviceTechnician.findOneAndUpdate({devId: devId, techId: element},
+                {$set: updateData},
+                {'upsert': true,},
+                );
+        })
 
-    // devTech.save(function (err) {
-    //     if (err) {
-    //         return next(err);
-    //     }
-    //     res.send('DeviceTechnician Created successfully')
-    // })
+        return res.status(200).send( { status: true, 'message': 'Succesfully added!'}) 
+    } catch (error) {
+        return next(error)
+    }  
+}
 
-    DeviceTechnician.update({devId: devTech.devId, techId: devTech.techId},
-        {},
-        {'upsert': true},
-        function (err, doc) {
-            if(err){
-                return next(err)
-            }
-            res.send(doc)
-        }
-        );
+module.exports.delete = async (req,res,next) => {
+    try {
+          let devId = req.body.devId
+          let techId = req.body.techId
+
+          const result = await DeviceTechnician.findOneAndDelete({devId: devId, techId: techId});
+        
+        return res.status(200).send( { status: true, 'message' : `Succesfully deleted!`}) 
+    } catch (error) {
+        return next(error)
+    }  
 }
