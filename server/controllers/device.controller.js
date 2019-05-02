@@ -22,6 +22,7 @@ module.exports.create = async (req,res,next) => {
               device_name: capital_letter(req.body.device_name),
               data_source: req.body.data_source,
               location: capital_letter(req.body.location),
+              symbol: req.body.symbol
           });
           await device.save()
           return res.status(200).send({status: true , 'message':`${req.body.device_name} Created successfully`})
@@ -176,6 +177,7 @@ module.exports.update = async (req, res,next) => {
         device_name: capital_letter(req.body.device_name),
         data_source: req.body.data_source,
         location: capital_letter(req.body.location),
+        symbol: req.body.symbol
       }
       const { ...updateData } = device
       const update = await Device.findOneAndUpdate({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })

@@ -68,9 +68,10 @@ router.post('/createUserNotification/:id', ctrlUserNotification.create)
 router.post('/insertReading/', ctrlReading.insert)
 router.get('/getNow', ctrlReading.get)
 router.post('/getByTopic', ctrlReading.getByTopic)
-
+router.get('/getAvgMaxMinByTopic', ctrlReading.getAvgMaxMinByTopic)
 //send sms
 
 router.post('/sendSms', _sms.sendSMS)
 router.post('/openModem', _sms.openModem)
+router.post('/executeCommand', _sms.executeCommand)
 module.exports = router

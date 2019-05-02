@@ -128,7 +128,7 @@
                                                 {{message.created_at  | moment("from", "now", true)}} ago
                                               </td>
                                           </tr> -->
-                                           <tr  v-for="message in visibleNotif" 
+                                           <tr  v-for="(message,index) in visibleNotif" 
                                            :key="message._id" 
                                            :class="[message.users.length == 0 ? 'unread':'read']"
                                            :visibleNotif="visibleNotif"
@@ -141,7 +141,7 @@
                                               </td>
                                               <td class="hidden-xs">
                                                 <nuxt-link to=""></nuxt-link>
-                                                  <nuxt-link @click.native="createUserNotification(message._id)"  :to="'/notification/' + message._id" class="email-msg">{{message.subject}}</nuxt-link>
+                                                  <nuxt-link @click.native="createUserNotification(message._id,index)"  :to="'/notification/' + message._id" class="email-msg">{{message.subject}}</nuxt-link>
                                               </td>
                                               
                                               <td class="text-right">
@@ -204,7 +204,7 @@
       // })
     },
     async asyncData({store}) {
-      await store.dispatch("notification/setUserMessagesRec")
+      // await store.dispatch("notification/setUserMessagesRec")
     },
     created() {
       // this.$store.dispatch("notification/setUserMessagesRec")
@@ -223,7 +223,7 @@
             {
                 let msg = JSON.parse( message.toString('utf8') )
                 // this.$store.dispatch("notification/newMessageNotification", msg[0])
-                this.$store.dispatch("notification/setUserMessagesRec")
+                // this.$store.dispatch("notification/setUserMessagesRec")
                 this.updateVisibleNotif()
             }
             
@@ -237,13 +237,17 @@
   this.updateVisibleNotif()
  },
 methods: {  
-  async createUserNotification (id) {
+  async createUserNotification (id, index) {
     // console.log('user_id '+this.user._id)
     // console.log('notifId '+id)
+    let current = this.currentPage * this.pageSize + index
+    // console.log(index)
     try {
-        await this.$axios.post(`/api/createUserNotification/${this.user._id}`, {
-          notifId: id
+        let result = await this.$axios.post(`/api/createUserNotification/${this.user._id}`, {
+          notifId: id,
       })
+      console.log(result.data)
+      this.$store.dispatch("notification/setReadMsg", current)
       // console.log("SUCCESS")
     } catch (error) {
       console.log(error)

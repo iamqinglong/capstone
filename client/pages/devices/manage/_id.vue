@@ -211,7 +211,7 @@ import style_thirteen from '@/static/css/style_thirteen.css'
             }   
         },
     async asyncData ({ params, error, $axios, store }) {
-      await store.dispatch("notification/setUserMessagesRec")
+      // await store.dispatch("notification/setUserMessagesRec")
       
       let [device, technician, events] =  await Promise.all([ $axios.get(`/api/getDeviceTechnician/${params.id}`),
                                  $axios.get(`/api/getAllNotDeviceTechnician/${params.id}`),

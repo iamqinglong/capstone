@@ -3,8 +3,9 @@ const Reading = mongoose.model('Reading')
 // const DeviceTechnician = mongoose.model('DeviceTechnician')
 // const Technician = mongoose.model('Technician')
 var Schema = mongoose.Schema;
-const moment = require('moment-timezone')
+// const moment = require('moment-timezone')
 const _ = require('lodash')
+const moment =  require('moment')
 
 module.exports.insert = async (req,res,next) => {
     try {
@@ -16,6 +17,7 @@ module.exports.insert = async (req,res,next) => {
         time -= time.getTime() % 1000
         
         let sample = [[time, parseInt(req.body.value)]]
+        console.log('first: ', sample[0][0])
         await Reading.findOneAndUpdate(
                 {
                     // device_id: req.body.device_id, 
@@ -90,6 +92,8 @@ module.exports.getByTopic = async (req, res, next) => {
         let to = new Date(req.body.to)
         from.setHours(from.getHours()+8)
         to.setHours(to.getHours()+8)
+        console.log("From: ", from)
+        console.log("To: ", to)
         let reading = await Reading.aggregate ([
                 {$match: {
                      "topic": { $in: req.body.topics },
@@ -192,6 +196,63 @@ module.exports.insertDummy = async (req,res,next) => {
     
 
         return res.status(200).send( { status: true, 'message': 'Reading successfully inserted!'}) 
+    } catch (error) {
+        return next(error)
+    }  
+}
+
+module.exports.getAvgMaxMinByTopic = async (req,res,next) => {
+    try {
+        
+            let from = moment().startOf('day').add(8, 'hours');
+            let to = moment().endOf('day').add(8, 'hours');
+            console.log('Topic: ',req.query.topic)
+            console.log('FROM: ', from.toISOString(), from.valueOf())
+            console.log('TO: ', to.toISOString(), to.valueOf())
+            let reading = await Reading.aggregate ([
+                {$match: {
+                    "topic":  req.query.topic,
+                    $or:[
+                        {"first": {$gte: new Date(from.toISOString())}},
+                        { "last": {$lte: new Date(to.toISOString())}}
+                    ],
+                    }
+                },
+                {$unwind: {path: "$samples"}},
+                {
+                    $project:
+                    {
+                        "topic": '$topic',
+                        "first": '$first',
+                        "last":  '$last',
+                        "samples": '$samples',
+                        'time': { $arrayElemAt: [ "$samples", 0 ] },
+                        'val': { $arrayElemAt: [ "$samples", 1 ] },
+                    }
+                },
+                {$match: {
+                        "time": {
+                            $gte: from.valueOf(),
+                            $lte: to.valueOf()}
+                        }
+                },
+                {$group :{
+                    "_id":  '$topic' ,
+                    // "first": { '$first': '$first' },
+                    // "last": { '$first': '$last' },
+                    "avg": {
+                        $avg: '$val'
+                    },
+                    "min": {
+                        $min: '$val'
+                    },
+                    "max": {
+                        $max: '$val'
+                    },
+                }}
+            ])
+        // let temp = JSON.parse(req.body.topics)
+        return res.status(200).send( reading )
     } catch (error) {
         return next(error)
     }  

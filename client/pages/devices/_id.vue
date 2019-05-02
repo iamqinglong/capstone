@@ -29,16 +29,21 @@
                                                             <small class="form-text text-danger" v-if="errors.device_name">{{errors.device_name}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Data Source</label>
+                                                            <label for="" class="col-form-label">Device ID</label>
                                                             <input disabled v-model.trim="device.data_source" required="true" type="text" class="form-control" id="" placeholder="Data Source">
                                                             <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="" class="col-form-label">Location</label>
-                                                        <input v-model.trim="device.location" required="true" type="text" class="form-control" id="" placeholder="Set device location">
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-6">
+                                                            <label for="" class="col-form-label">Location</label>
+                                                            <input v-model.trim="device.location" required="true" type="text" class="form-control" id="" placeholder="Set device location">
+                                                        </div>
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Unit</label>
+                                                            <b-form-select v-model.trim="device.selectedUnit" :options="optionsUnit"></b-form-select>
+                                                        </div>
                                                     </div>
-                                                   
                                                     <!-- <button @click.prevent="update" type="submit" class="btn btn-primary">Update Device</button> -->
                                                     <button  type="submit" class="btn btn-primary">Update Device</button>
                                                     <button @click.prevent="deleteDevice" type="submit" class="btn btn-danger">Delete Device</button>
@@ -77,6 +82,10 @@ export default {
             // data_source : '',
             // location : '',
             // error : ''
+            optionsUnit: [
+                { value: '°C', text: `°C` },
+                { value: 'mg/L', text: `mg/L` },
+            ],
         }
     },
     validate ({ params }) {
@@ -84,7 +93,7 @@ export default {
         return params.id
     },
     async asyncData ({ params, error, $axios, store}) {
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
       return await $axios.get(`/api/getDevice/${params.id}`)
         
     .then((res) => {
@@ -94,13 +103,18 @@ export default {
                     id : res.data.device[0]._id,
                     device_name: res.data.device[0].device_name,
                     data_source: res.data.device[0].data_source,
-                    location: res.data.device[0].location, 
+                    location: res.data.device[0].location,
+                    // symbol: res.data.device[0].symbol,
+                    selectedUnit: res.data.device[0].symbol,
+                   
                     },
                 oldDevice: {
                     id : res.data.device[0]._id,
                     device_name: res.data.device[0].device_name,
                     data_source: res.data.device[0].data_source,
                     location: res.data.device[0].location, 
+                    // symbol: res.data.device[0].symbol,
+                    selectedUnit: res.data.device[0].symbol,
                     },
                 }
 
@@ -167,7 +181,8 @@ export default {
 
                          device_name: this.device.device_name,
                         data_source: this.device.data_source,
-                        location: this.device.location
+                        location: this.device.location,
+                        symbol: this.device.selectedUnit
 
                     })
                     this.$swal.fire({

@@ -30,8 +30,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Device Name</th>
-                                                <th>Data Source</th>
+                                                <th>Device ID</th>
                                                 <th>Location</th>
+                                                <th>Symbol</th>
                                                 <th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Actions" style="width: 223.2px;">Actions</th>
                                             </tr>
                                             </thead>
@@ -41,6 +42,7 @@
                                                 <td>{{device.device_name}}</td>
                                                 <td>{{device.data_source}}</td>
                                                 <td>{{device.location}}</td>
+                                                <td>{{device.symbol}}</td>
                                                  <td class="actions">
                                                     <nuxt-link :to="'/devices/' + device._id" href="" class="on-default edit-row" v-b-tooltip.hover title="Edit"><i class="fa fa-pencil"></i></nuxt-link>
                                                     <!-- <nuxt-link :to="'/devices/delete/' + device._id" href="" class="on-default remove-row" v-b-tooltip.hover title="Delete"><i class="fa fa-trash-o"></i></nuxt-link> -->
@@ -93,7 +95,7 @@ export default {
     // ...mapGetters(['loggedInUser']),
   },
    async asyncData ({ params, error , $axios, store}) {
-       await store.dispatch("notification/setUserMessagesRec")
+    //    await store.dispatch("notification/setUserMessagesRec")
         return await $axios.get('/api/getAllDevice')
 
     .then((res) => {

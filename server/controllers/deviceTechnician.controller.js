@@ -6,11 +6,18 @@ module.exports.create = async (req,res,next) => {
     try {
         let devId = mongoose.Types.ObjectId(req.params.id);
         let techIds = req.body.techIds;
+        
         techIds.forEach( async (element) => {
-        await DeviceTechnician.findOneAndUpdate({devId: devId, techId: element},
-              {},
-              {'upsert': true, runValidators: true},
-              );
+            let devTech = {
+                devId : devId,
+                techId : element
+              }
+              let { ...updateData } = devTech
+              
+            await DeviceTechnician.findOneAndUpdate({devId: devId, techId: element},
+                {$set: updateData},
+                {'upsert': true,},
+                );
         })
 
         return res.status(200).send( { status: true, 'message': 'Succesfully added!'}) 

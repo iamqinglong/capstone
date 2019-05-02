@@ -28,17 +28,27 @@
                                                             <small class="form-text text-danger" v-if="errors.device_name">{{errors.device_name}}</small>
                                                         </div>
                                                         <div class="form-group col-md-6">
-                                                            <label for="" class="col-form-label">Data Source</label>
+                                                            <label for="" class="col-form-label">Device ID</label>
                                                             <input v-model.trim="form.data_source" type="text" required="true" class="form-control" id="" placeholder="Data Source">
                                                             <small class="form-text text-danger" v-if="errors.data_source">{{errors.data_source}}</small>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="" class="col-form-label">Location</label>
-                                                        <input v-model.trim="form.location" type="text" required="true" class="form-control" id="" placeholder="Set device location">
-                                                        <small class="form-text text-danger" v-if="errors.location">{{errors.location}}</small>
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-6">
+                                                            <label for="" class="col-form-label">Location</label>
+                                                            <input v-model.trim="form.location" type="text" required="true" class="form-control" id="" placeholder="Set device location">
+                                                            <small class="form-text text-danger" v-if="errors.location">{{errors.location}}</small>
+                                                        </div>
+                                                        <!-- <div class="form-group col-md-6">
+                                                            <label for="" class="col-form-label">Unit</label>
+                                                            <input v-model.trim="form.symbol" type="text" required="true" class="form-control" id="" placeholder="Set device unit">
+                                                            <small class="form-text text-danger" v-if="errors.symbol">{{errors.symbol}}</small>
+                                                        </div> -->
+                                                        <div class="form-group col-md-3">
+                                                            <label for="" class="col-form-label">Unit</label>
+                                                            <b-form-select v-model="selectedUnit" :options="optionsUnit"></b-form-select>
+                                                        </div>
                                                     </div>
-                                                   
                                                     <!-- <button @click.prevent="create" type="submit" class="btn btn-primary">Create Device</button> -->
                                                     <button type="submit" class="btn btn-primary">Connect Device</button>
                                                     <button @click.prevent="cancel" type="submit" class="btn btn-warning waves-effect waves-light">Cancel</button>
@@ -67,11 +77,17 @@ export default {
                 device_name: '',
                 data_source: '',
                 location: '',
-            }
+                symbol: ''
+            },
+            selectedUnit: '°C',
+            optionsUnit: [
+            { value: '°C', text: `°C` },
+            { value: 'mg/L', text: `mg/L` },
+            ],
         }
     },
     async asyncData({store}) {
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
     },
     async mounted() {
 
@@ -109,7 +125,8 @@ export default {
 
                     device_name: this.form.device_name,
                     data_source: this.form.data_source,
-                    location: this.form.location
+                    location: this.form.location,
+                    symbol: this.selectedUnit
 
                 })
                 

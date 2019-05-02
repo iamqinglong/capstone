@@ -19,12 +19,13 @@ const readLine = serialPort.parsers.Readline;
 const axios = require('axios');
 const ip = require('ip')
 const mosca = require('mosca')
-// const _sms = require('./sms')
+const _sms = require('./sms')
 const serialportgsm = require('serialport-gsm')
-let modemPort="COM12"; // default serial port for modemy
+// const router = require('./node_modules/huawei-router-api');
+let modemPort="COM4"; // default serial port for modemy
 const gsmModem = serialportgsm.Modem();
         const options = {
-            baudRate: 115200,
+            baudRate: 9600,
             dataBits: 8,
             parity: 'none',
             stopBits: 1,
@@ -33,15 +34,24 @@ const gsmModem = serialportgsm.Modem();
             rtscts: false,
             xoff: false,
             xany: false,
-            autoDeleteOnReceive: true,
+            // autoDeleteOnReceive: true,
             enableConcatenation: true,
             incomingCallIndication: true,
-            autoOpen: true,
+            // incomingSMSIndication: true,
+            // customInitCommand: `AT+CPMS="SM","SM","SM"`,
+            // autoOpen: true,
+            logger: console,
         }
 let modemStatus = false;
 let modemNumber = null
 let modemSignal = null;
-let portStatus = false;
+let portStatus = false; 
+let balanceStatus = false;
+
+// router.config.setUrl('http://192.168.1.1');
+// router.config.setUsername('admin');
+// router.config.setPassword('password');
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use( bodyParser.urlencoded({ extended : false }) );
@@ -133,6 +143,37 @@ websocket.createServer({server: web}, aedes.handle);
 //     }
 // });
 
+// async function checkStatistics() {
+//     // Check if we are logged into the router already
+//     const loggedIn = await router.admin.isLoggedIn();
+//     if (!loggedIn) {
+//       // If we aren't, login
+//       await router.admin.login();
+//     }
+//     const stats = await router.monitoring.getTrafficStatistics();
+//     let smsDetails = {numbers: ['09122854978'],
+//     content: 'this is test using api 2'}
+//     const sms = await router.sms.sendSms(smsDetails);
+//     console.log(stats);
+//     console.log(sms)
+//     const smsList = await router.sms.getSmsList(1,20,1,desc)
+//     console.log(smsList)
+//   }
+// async function sendSMSTest() {
+//     // Check if we are logged into the router already
+//     const loggedIn = await router.admin.isLoggedIn();
+//     if (!loggedIn) {
+//       // If we aren't, login
+//       await router.admin.login();
+//     }
+//     let smsDetails = {numbers: ['09187004596'],
+//                       content: 'this is test using api'}
+//                       console.log(smsDetails)
+//     const sms = await router.sms.sendSms(smsDetails);
+//     console.log(sms);
+// }
+//   checkStatistics();
+// //   sendSMSTest()
 //SMS EVENTS
 gsmModem.on('open', async(msg) => { console.log('on open result: ',msg)
           
@@ -223,7 +264,7 @@ aedes.on('publish', async (packet, client, topic ) => {
     packet.payload = JSON.stringify(packet.payload);
     packet.timestamp = new Date();
 
-    // console.log('Publisher : ',client.id, ' Value : ', packet.payloadString, ' Topic : ', packet.topic)
+    console.log('Publisher : ',client.id, ' Value : ', packet.payloadString, ' Topic : ', packet.topic)
     // console.log(packet);
 
        try{
@@ -379,7 +420,13 @@ aedes.on('unsubscribe', async (subscriptions, client) => {
                                 payload: JSON.stringify(res.data.result),
                                 retain: false
                             });
+            if(modemStatus)
+            {
+                console.log(res.data.result)
+                sendSMS(element,`${res.data.result[0].message} , This is an automated service. Please do not reply`)
+            }
         })
+       
         
         console.log('Unsubs client: ' , id[0])
         console.log('topics : ' , subscriptions)
@@ -446,9 +493,11 @@ app.post('/openModem',(req,response,next)=>{
                         return
                     }
                     console.log('initialize msg:', msg.data)
-
+                    gsmModem.checkSimMemory(a => {
+                        console.log(a)
+                    })
                      // gsmModem add at+qnwinfo (carrier info), and at+qspn (service provider name)  for debug logs
-                    gsmModem.setModemMode(async(msg,err) => {
+                    gsmModem.setModemMode(async(msgMode,err) => {
                         if (err) {
                             //console.log(`Error Setting Modem Mode - ${err}`);
                             console.log("Gateway", `Error Setting Modem Mode`);
@@ -472,25 +521,78 @@ app.post('/openModem',(req,response,next)=>{
 
                             return
                         } 
-                        console.log(`Set Mode: ${msg.data}`);
-                        modemStatus = true
-                        console.log('Modem status ', modemStatus)
 
-                        let res = await axios.post(`http://${ip.address()}:${process.env.PORT}/api/createNotification`,{
-                            subject : `Modem succesfully connected`,
-                            message: `Modem at ${data.data.modem} status ${data.data.status}`
+                        gsmModem.getOwnNumber(async (msg,err) => {
+                            if(err)
+                            {
+                                console.log("Gateway", `Error getting own number`);
+                              
+                                response.send({status: false, message: 'Error getting own number'})
+                                // modemStatus = false
+                                console.log('Modem status ', modemStatus)
+                                gsmModem.close((err) => {
+                                    console.log('port closed', err);
+                                })
+                            }
+                            else{
+                                // console.log("AT+CPMS: ","AT+CPMS=\"SM\",\"SM\",\"SM\"")
+                                // gsmModem.executeCommand(`AT+CPMS="SM","SM","SM"`, ((data,err) => {
+                                //     if(err)
+                                //     {
+                                //         console.log('Exec Error: ',err)
+                                //     }
+                                //     else{
+                                //         console.log("Result from execute command: ", data)
+                                //         gsmModem.getSimInbox((result, err) => {
+                                //             if(err) {
+                                //                 console.log(`Failed to get SimInbox ${err}`);
+                                //             } else {
+                                //                 console.log(`Sim Inbox Result: ${JSON.stringify(result)}`);
+                                //             }
+                                //         });
+                                //     }
+                                    
+                                // }), false, 30000)
+                                gsmModem.getSimInbox((result, err) => {
+                                            if(err) {
+                                                console.log(`Failed to get SimInbox ${err}`);
+                                            } else {
+                                                console.log(`Sim Inbox Result: ${JSON.stringify(result)}`);
+                                            }
+                                        });
+                               
+
+                                // console.log(msg)
+                                console.log(`Set Mode: ${msgMode.data}`);
+                                modemStatus = true
+                                console.log('Modem status ', modemStatus)
+        
+                                let res = await axios.post(`http://${ip.address()}:${process.env.PORT}/api/createNotification`,{
+                                    subject : `Modem succesfully connected`,
+                                    message: `Modem at ${data.data.modem} status ${data.data.status}`
+                                })
+                                modemPort = data.data.modem
+                                portStatus = true;
+                                aedes.publish({
+                                    qos: 0,
+                                    topic: '/notification',
+                                    payload: JSON.stringify(res.data.result),
+                                    retain: false
+                                });
+                                
+                                
+                                response.send({status: true, message: 'Modem succesfully connected'})
+                            }
                         })
-                        modemPort = data.data.modem
-                        portStatus = true;
-                        aedes.publish({
-                            qos: 0,
-                            topic: '/notification',
-                            payload: JSON.stringify(res.data.result),
-                            retain: false
-                        });
-                        
-                        
-                        response.send({status: true, message: 'Modem succesfully connected'})
+
+                        gsmModem.on('onNewMessage', data => {
+                            console.log(data)
+                        })
+
+                        gsmModem.on('onNewIncomingCall', result => {
+                            console.log(result)
+                        })
+                 
                     }, "PDU");
         
                     });
@@ -512,29 +614,23 @@ app.get('/getModemDetails',  (req,res,next) => {
                 gsmModem.getOwnNumber( (msg,err) => {
 
                     if (err) {
-                        //console.log(`Error retrieving Signal Strength - ${err}`);
+
                         console.log("Gateway", `Error retrieving Signal Strength`);
-                        // details.status = false;
-                        // return {number: null}
+                       
                         res.send({status: modemStatus})
+                        return
                     } else {
                         console.log(msg);
-                        // details.number = msg.data.number
-                        // details.status = true;
-                        // console.log(details)
                         gsmModem.getNetworkSignal(async (sigStrength, err) => {
                             if (err) {
-                                //console.log(`Error retrieving Signal Strength - ${err}`);
                                 console.log("Gateway", `Error retrieving Signal Strength`);
-                                // details.status = false;
+                          
                                 res.send({status: modemStatus})
+                                return
                             } else {
-                                // console.log(sigStrength);
-                                // details.signal = sigStrength.data.signalQuality
-                                // details.status = true;
-                                // console.log(details.signal)
-                                // return { signal: sigStrength.data.signalQuality}
+                                
                                 res.send({status: modemStatus, comPort: modemPort, number: msg.data.number, sigStrength: sigStrength.data.signalQuality})
+                                return
                             }
                         });
                         
@@ -568,6 +664,20 @@ async function getSignal() {
         // }
     });
 }
+app.post('/execAtCommand', async (req,res,next) => {
+    gsmModem.executeCommand(req.body.command, ((data,err) => {
+        if(err)
+        {
+            console.log('Exec Error: ',err)
+            res.send("Error")
+        }
+        else{
+            console.log("Result from execute command: ", data)
+            res.send(data)
+        }
+        // res.send(data)
+    }), false, 30000)
+})
 async function getNumber (){
     gsmModem.getOwnNumber(async (msg,err) => {
 
@@ -587,33 +697,56 @@ async function getNumber (){
 }
 app.post('/sendSMS', async (req,response,next) =>{
     try {
-        
-        let res = await sendSMS(req.body.number, req.body.message)
-        response.send({res})
+        //send balance 
+        if(balanceStatus)
+        {
+            let res = await sendSMS(req.body.number, req.body.message)
+            // console.log(res)
+            response.send({'Balance status: ': true})
+        }
+        else{
+            let res = await sendSMS(req.body.number, req.body.message)
+            // console.log(res)
+            response.send({'Balance status: ': false})
+        }
 
     } catch (error) {
         return next(error)
     }
 })
-async function sendSMS(number,message){
-    gsmModem.sendSMS(number,message, false, async (result) => {
-        if (result.status==="Error") {
 
-            console.log("Gateway", `Failed to send message: ${result.error}`);
-            return {
-                status : false,
-                message: 'Unable to send message'
-            }
-        } else {
+gsmModem.on('onNewMessageIndicator', data => {
+//indicator for new message only (sender, timeSent)
+    console.log(data)
+})
+
+gsmModem.on('onNewMessage', data => {
+    //whole message data
+    console.log(data)
+})
+async function sendSMS(number,message){
+    let status = false;
+    gsmModem.sendSMS(number,message, true, async (response) => {
+        console.log("message status: ", response)
+        status =  true
+        // if (result.status==="Error") {
+
+        //     console.log("Gateway", `Failed to send message: ${result.error}`);
+        //     return {
+        //         status : false,
+        //         message: 'Unable to send message'
+        //     }
+        // } else {
             
-            console.log(result)
-            return {
-                status: true,
-                message: `Successfully send to ${number}`
-            }
-        }
+        //     console.log(result)
+        //     return {
+        //         status: true,
+        //         message: `Successfully send to ${number}`
+        //     }
+        // }
         
     });
+    return status;
 }
 
 // app.get('/',(req,res)=>{

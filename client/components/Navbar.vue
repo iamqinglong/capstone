@@ -8,10 +8,11 @@
                     <!-- Logo container-->
                     <div class="logo">
                         <!-- Text Logo -->
-                        <a href="index.html" class="logo">
+                        
+                        <nuxt-link to="/" class="logo">
                             <span class="logo-small"><i class="mdi mdi-radar"></i></span>
                             <span class="logo-large"><i class="mdi mdi-radar"></i> Water Quality Monitoring System</span>
-                        </a>
+                        </nuxt-link>
                         <!-- Image Logo -->
                         <!--<a href="index.html" class="logo">-->
                             <!--<img src="assets/images/logo_dark.png" alt="" height="24" class="logo-lg">-->
@@ -50,9 +51,9 @@
 
                             
                                     
-                                    <nuxt-link  v-for="message in notification.messagesRec.slice(0,5)" 
+                                    <nuxt-link  v-for="(message,index) in notification.messagesRec.slice(0,5)" 
                                     :key="message._id" 
-                                    @click.native="createUserNotification(message._id)"  
+                                    @click.native="createUserNotification(message._id,index)"  
                                     :to="'/notification/' + message._id" 
                                     v-bind:class="[message.users.length == 0 ? 'unread':'read']"
                                     class="dropdown-item notify-item">
@@ -77,19 +78,9 @@
                                     </div>
 
                                     <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                    <nuxt-link to="/profile"  class="dropdown-item notify-item">
                                         <i class="mdi mdi-account"></i> <span>Profile</span>
-                                    </a>
-
-                                    <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                        <i class="mdi mdi-settings"></i> <span>Settings</span>
-                                    </a>
-
-                                    <!-- item-->
-                                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                        <i class="mdi mdi-lock-open"></i> <span>Lock Screen</span>
-                                    </a>
+                                    </nuxt-link>
 
                                     <a href="" @click.prevent="logout" class="dropdown-item notify-item">
                                         <i class="mdi mdi-logout"></i> <span>Logout</span>
@@ -202,7 +193,7 @@ export default {
                 let msg = JSON.parse( message.toString('utf8') )
                 console.log(msg)
                 this.$store.dispatch("notification/newMessageNotification", msg[0])
-                await this.$store.dispatch("notification/setUserMessagesRec")
+                // await this.$store.dispatch("not  ification/setUserMessagesRec")
 
                 this.$izitoast.warning({
                                     title: 'Caution',
@@ -227,12 +218,14 @@ export default {
     async logout() {
       await this.$auth.logout();
     },
-    async createUserNotification (id) {
+    async createUserNotification (id,index) {
   
     try {
         await this.$axios.post(`/api/createUserNotification/${this.user._id}`, {
           notifId: id
       })
+    //   console.log(result.data)
+      this.$store.dispatch("notification/setReadMsg", index)
 
     } catch (error) {
       console.log(error)

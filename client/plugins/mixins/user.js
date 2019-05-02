@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
-
+import { mapState } from 'vuex'
 const User = {
     install (Vue, options) {
         Vue.mixin({
@@ -8,7 +8,10 @@ const User = {
                 ...mapGetters({
                     user: 'auth/user',
                     authenticated: 'auth/authenticated'
-                })
+                }),
+                // ...mapState({
+                //     user : state => state.auth.user
+                //   }),
             }
         })
     }

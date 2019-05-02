@@ -120,7 +120,7 @@ export default {
             }   
         },
     async asyncData ({ params, error, $axios, store }) {
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
         return await $axios.get('/api/getAllTechnician')
 
     .then((res) => {
@@ -211,15 +211,17 @@ export default {
 };
 </script>
 
-<style type="scss">
+<style  scoped>
 #app {
   width: 95%;
   margin-top: 50px; 
 }
   .table {
-    color: #f2f5f9;
+    color: #fafafa;
 }
-
+.body {
+    color: #fafafa;
+}
 .VuePagination {
   text-align: center;
 }
@@ -261,7 +263,7 @@ th:nth-child(3) {
 }
 
 .table .thead-dark th {
-    color: #fff;
+    color: #fafafa;
     background-color: #343a40;
     border-color: #454d55;
 }

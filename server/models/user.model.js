@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema({
         required:  `Password can't be empty`,
         validate: passValidator
     },
+    number: {
+        type: String,
+        required:  `Number can't be empty`,
+        unique: true
+    },
     saltSecret: String
 })
 userSchema.path('email').validate((val) => {

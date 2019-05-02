@@ -13,7 +13,7 @@
                             <p _ngcontent-c10="">Current: </p>
                         </div>
                         <div _ngcontent-c10="" class="d-2 current-value" >
-                            <p _ngcontent-c10="" v-bind:value="current" >{{current}}<sup _ngcontent-c10="">°C</sup></p>
+                            <p _ngcontent-c10="" >{{current}}<sup _ngcontent-c10="">{{device.symbol}}</sup></p>
                         </div>
                         </div>
                         <div class="containerMe" >
@@ -25,15 +25,15 @@
                         <div _ngcontent-c10="" class="row ng-star-inserted">
                         <div _ngcontent-c10="" class="d-flex st-bar">
                             <div _ngcontent-c10="" class="d-2 col-sm-4" >
-                            10<sup _ngcontent-c10="">°</sup>
+                            {{avg}}<sup _ngcontent-c10="">{{device.symbol}}</sup>
                             <p _ngcontent-c10="">Average</p>
                             </div>
                             <div _ngcontent-c10="" class="d-2 col-sm-4" >
-                            10<sup _ngcontent-c10="">°</sup>
+                            {{max}}<sup _ngcontent-c10="">{{device.symbol}}</sup>
                             <p _ngcontent-c10="">Highest</p>
                             </div>
                             <div _ngcontent-c10="" class="d-2 col-sm-4" >
-                            10<sup _ngcontent-c10="">°</sup>
+                            {{min}}<sup _ngcontent-c10="">{{device.symbol}}</sup>
                             <p _ngcontent-c10="">Lowest</p>
                             </div>
                         </div>                          
@@ -74,7 +74,11 @@ export default {
         return {
             // client: mqtt.connect('ws:127.0.0.1:8000'),
             device: this.dev,
-            current: 10,
+            current: 0,
+            avg: 0,
+            max: 0,
+            min: 0,
+
             chartOptions: {
             chart: {
                 type: 'spline',
@@ -175,13 +179,14 @@ export default {
                 this.setCurrent(msg)
                 let time =  (new Date()).getTime();
                 series.addPoint([time, parseInt(msg)],true,true);
+                this.getAvgMaxMinByTopic(this.device.data_source)
             }
             else if(topic === '/status')
             {
                 let msg = message.toString('utf8')
                 if(msg == this.device.data_source)
                 {
-                    console.log(msg)
+                    // console.log(msg) 
                     let result = await this.$axios.get(`/api/getDevice/${this.dev._id}`)
                     this.device = result.data.device[0]
                 }
@@ -245,7 +250,15 @@ export default {
             },
             async setCurrent(value) {
                 this.current = value;
-            }
+            },
+            async getAvgMaxMinByTopic(topic){
+                let result = await this.$axios.get(`/api/getAvgMaxMinByTopic/?topic=${topic}`)
+                console.log(result.data)
+                this.avg = result.data[0].avg
+                this.max = result.data[0].max
+                this.min = result.data[0].min
+            },
+
            
     },
     destroyed() {

@@ -71,7 +71,7 @@ module.exports.userProfile = (req,res,next) => {
             if(!user)
                 return res.status(404).json({ status: false, message: 'User record not found'})
             else
-                return res.status(200).json({status: true, user: _.pick(user,['_id','fullName','lastName','email'])})
+                return res.status(200).json({status: true, user: _.pick(user,['_id','firstName','lastName','email', 'number'])})
         }
     )
 }
@@ -98,7 +98,7 @@ module.exports.getById = async (req,res,next) => {
 
         let user = await User.findOne({ _id: req.params.id},)
         // return res.status(200).send( user )
-        return res.status(200).json({status: true, user: _.pick(user,['_id','firstName','lastName','email'])})
+        return res.status(200).json({status: true, user: _.pick(user,['_id','firstName','lastName','email','number'])})
 
     } catch (error) {
         return next(error)
@@ -128,12 +128,21 @@ module.exports.update = async (req,res,next) => {
               user.firstName = capital_letter(req.body.firstName),
               user.lastName = capital_letter(req.body.lastName),
               user.password = req.body.password,
-              user.email = req.body.email
+              user.email = req.body.email,
+              user.number = req.body.number
         // }
         const result = await user.save();
+        // console.log(result)
+        let tempUser = {
+            _id: result._id,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email,
+            number: result.number
+        }
         // const { ...updateData } = user
         // const update = await User.update({_id:id},{$set: updateData}, { new: true, runValidators: true, context: 'query' })
-        return res.status(200).send( { status: true, message: `${req.body.firstName} details updated to ${result.firstName} details successfully!`} )
+        return res.status(200).send( { status: true, user: tempUser, message: `${req.body.firstName} details updated to ${result.firstName} details successfully!`} )
         
     } catch (error) {
        
@@ -150,6 +159,7 @@ module.exports.create = async (req,res,next) => {
             lastName: capital_letter(req.body.lastName.toLowerCase()),
             email:req.body.email,
             password: req.body.password,
+            number: req.body.number
         })
         
         let result = await user.save()

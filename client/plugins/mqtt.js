@@ -6,7 +6,7 @@ if (process.browser) {
     const ip = require('ip')
     console.log(ip.address())
     // Vue.use(VueMqtt, `ws://${ip.address()}:8000`);
-   Vue.use(VueMqtt, `ws://192.168.1.99:8000`);
+   Vue.use(VueMqtt, `ws://192.168.137.232:8000`);
     // Vue.use(VueMqtt, 'ws://localhost:8000');
 }
 

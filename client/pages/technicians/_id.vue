@@ -92,7 +92,7 @@ export default {
     // },
     async asyncData ({ params, error, $axios, store }) {
         
-      await store.dispatch("notification/setUserMessagesRec")
+    //   await store.dispatch("notification/setUserMessagesRec")
       return  await $axios.get(`/api/getTechnician/${params.id}`)
         
     .then((res) => {

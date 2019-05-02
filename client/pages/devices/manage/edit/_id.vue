@@ -94,7 +94,7 @@ export default {
     },
     async asyncData({params, error, $axios, store }) {
         // let res = await $axios.get(`/getEvent/${params.id}`)
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
         const [evId, devId ] = params.id.split('_')
 
         let [event, device] =  await Promise.all([ 
@@ -123,7 +123,8 @@ export default {
         this.optionsStatement.push(
                 { value: 'goes more than', text: `${this.device.device_name} goes more than` },
                 { value: 'goes less than', text: `${this.device.device_name} goes less than` },
-                { value: 'idle for', text: `${this.device.device_name} is idle for` },)
+                // { value: 'idle for', text: `${this.device.device_name} is idle for` },
+                )
 
 
         // this.$mqtt = await this.$mqtt

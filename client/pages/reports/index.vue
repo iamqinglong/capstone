@@ -118,6 +118,7 @@ import moment from 'moment'
 // import {Chart} from 'highcharts-vue'
 // import VueHighcharts from "vue2-highcharts";
 import Exporting from "highcharts/modules/exporting";
+import ExportData from "highcharts/modules/data";
 import Highcharts from "highcharts";
 // Exporting(Highcharts);
 // import Vue from "vue";
@@ -163,7 +164,7 @@ export default {
             },
             ranges: { //default value for ranges object (if you set this to false ranges will no be rendered)
                     'Today': [moment().startOf('day'), moment().endOf('day')],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
                     'This month': [moment().startOf('month'), moment().endOf('month')],
                     'Last month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'This year': [moment().startOf('year'), moment().endOf('year')],
@@ -348,7 +349,7 @@ export default {
         }
   },
      async asyncData({store, $axios}) {
-      await store.dispatch("notification/setUserMessagesRec")
+    //   await store.dispatch("notification/setUserMessagesRec")
       let res = await $axios.get('/api/getAllDevice')
       let optionsDevices = []
       res.data.forEach( async (element)=> {
@@ -460,7 +461,7 @@ export default {
             // console.log(this.selectedDevices, this.dateRange)
             this.startDate = values.startDate.toISOString().slice(0, 10)
             this.endDate = values.endDate.toISOString().slice(0, 10)
-            
+        
             let topics = []
             if(this.selectedDevices.length != 0)
             {
@@ -478,14 +479,18 @@ export default {
 
             if(this.dateRange.endDate.getTime() > this.dateRange.startDate.getTime())
             {
+                ExportData(Highcharts)
+                Exporting(Highcharts);
                 this.statistics = []
                 this.status = true;
+                console.log("from: ",this.dateRange.startDate.toISOString())
+                console.log("to: ", this.dateRange.endDate.toISOString())
                 let result = await this.$axios.post('/api/getByTopic', 
                 {   topics: topics, 
                     from: this.dateRange.startDate.toISOString(), 
                     to: this.dateRange.endDate.toISOString()
                 })
-                Exporting(Highcharts);
+                
 
                 if(result.data != null || result.data.length != 0)
                 {

@@ -31,8 +31,15 @@ const deviceSchema = new mongoose.Schema({
         required: `Location can't be empty`,
         validate: nameValidator
     },
+    symbol: {
+        type: String,
+        // unique: true,
+        required: `Symbol can't be empty`,
+        // validate: nameValidator
+    },
     status : {
-        type: Boolean
+        type: Boolean,
+        default: false
     }
 })
 

@@ -44,7 +44,7 @@
                 <div class="form-group row m-t-30">
                     <div class="col-sm-7">
                         
-                         <nuxt-link to="/register">Create an account</nuxt-link>
+                         <!-- <nuxt-link to="/register">Create an account</nuxt-link> -->
                     </div>
                 </div>
             </form>

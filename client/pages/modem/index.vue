@@ -131,6 +131,7 @@ export default {
             
             if(modem.data.status){
                 let details = await this.$axios.get('/getModemDetails')
+                console.log(details.data)
                 this.status = details.data.status
                 this.modemPort = details.data.comPort
                 this.modemNumber = details.data.number

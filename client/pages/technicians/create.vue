@@ -96,7 +96,7 @@ export default {
         }
     },
      async asyncData({store}) {
-      await store.dispatch("notification/setUserMessagesRec")
+    //   await store.dispatch("notification/setUserMessagesRec")
     },
     async mounted() {
       this.data = this.technician
@@ -177,7 +177,7 @@ export default {
     },
 }
 </script>
-<style>
+<style >
 .field .field-input[data-v-55b51f4d] {
     cursor: pointer;
     background-color: #fff;
@@ -211,10 +211,11 @@ export default {
 }
 
 body {
-    color: #bbb5b5;
+    color: #fafafa;
 }
 
 .vue-phone-number-input .input-phone-number:not(.is-dark):not(.is-disabled) input {
-    background-color: #fff!important;
+    background-color: #fafafa!important;
 }
+
 </style>

@@ -77,7 +77,7 @@ export default {
         }
     },
     async asyncData({params, error, $axios, store}) {
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
         let res = await $axios.get(`/api/getDevice/${params.id}`)
         // console.log(params.id)
         return {

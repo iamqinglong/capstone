@@ -77,11 +77,11 @@ export default {
     //   })
     // },
     async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
-      await store.dispatch("notification/setUserMessagesRec")
+    //   await store.dispatch("notification/setUserMessagesRec")
     },
     created() {
         this.$store.dispatch('notification/getNotificationById', this.$route.params.id)
-        this.$store.dispatch("notification/setUserMessagesRec")
+        // this.$store.dispatch("notification/setUserMessagesRec")
     },
     destroyed() {
         this.$store.dispatch('notification/clearMessage')

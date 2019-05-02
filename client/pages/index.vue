@@ -63,7 +63,7 @@ export default {
         }
     },
     async asyncData ({ params, error, $axios, store }) {
-        await store.dispatch("notification/setUserMessagesRec")
+        // await store.dispatch("notification/setUserMessagesRec")
         return $axios.get('/api/getAllDevice')
 
         .then((res) => {

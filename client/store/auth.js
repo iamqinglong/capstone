@@ -15,3 +15,24 @@ export const state = () => ({
   strategy: "local",
   user: false,
   })
+
+export const actions = {
+  
+  async setUser ({commit }, user) {
+    
+      commit('SET_USER', user)
+  },
+  
+}
+
+//mutators
+export const mutations = {
+  SET_USER (state, user , unread){
+          state.user = user
+          
+  },
+
+  
+
+  
+}
